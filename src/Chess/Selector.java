@@ -1,0 +1,45 @@
+package Chess;
+
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
+public class Selector extends Rectangle{
+    double x = 0;
+    double y = 0;
+
+    public Selector(){
+        super();
+        x = 0;
+        y = 0;
+    }
+
+    public Selector(double v, double v1){
+        super();
+        x = 0;
+        y = 0;
+    }
+
+    public void addXCoord(double i) {
+        x += i;
+    }
+
+    public double getXCoord() {
+        return x;
+    }
+
+    public void addYCoord(double i) {
+        y += i;
+    }
+
+    public double getYCoord() {
+        return y;
+    }
+
+    public double getArrayX() {
+        return x / 32;
+    }
+
+    public double getArrayY() {
+        return y / 32;
+    }
+}
