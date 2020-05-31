@@ -10,9 +10,9 @@ import java.io.IOException;
 
 public class Piece {
     private String type;
-    private int maxX, maxY, maxD;
+    private int maxX, maxY;
     private int locX, locY;
-    boolean enemy;
+    boolean enemy, canD, canP;
 
     public Piece(String type, int x, int y, boolean e){
         enemy = e;
@@ -20,32 +20,35 @@ public class Piece {
         if(type.equals("queen")){
             maxX = 7;
             maxY = 7;
-            maxD = 7;
+            canP = true;
+            canD = true;
         }
         else if(type.equals("king")){
             maxX = 1;
             maxY = 1;
-            maxD = 0;
+            canP = true;
+            canD = false;
         }
         else if(type.equals("bishop")){
-            maxX = 0;
-            maxY = 0;
-            maxD = 7;
+            maxX = 7;
+            maxY = 7;
+            canP = false;
+            canD = true;
         }
         else if(type.equals("rook")){
             maxX = 7;
             maxY = 7;
-            maxD = 0;
+            canP = true;
+            canD = false;
         }
         else if(type.equals("knight")){
-            maxX = 1;
-            maxY = 1;
-            maxD = 1;
+            maxX = 2;
+            maxY = 2;
+            canP = true;
         }
         else if(type.equals("pawn")){
             maxX = 0;
             maxY = 1;
-            maxD = 0;
         }
         locX = x;
         locY = y;
@@ -102,10 +105,38 @@ public class Piece {
             else if(type.equals("queen")) {
                 return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteQueen.png"))));
             }
-            else if(type.equals("queen")) {
+            else if(type.equals("rook")) {
                 return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteRook.png"))));
             }
         }
         return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blankSpace.png"))));
+    }
+
+    public boolean checkEligibility(int x, int y){
+        if(type.equals("knight")){
+            if((((x - locX) == 2) && ((y - locY) == 1)) || ((x - locX) == 1) && ((y - locY) == 2)){
+                return true;
+            }
+            return false;
+        }
+        else if(((x - locX) <= maxX) && ((y - locY) <= maxY)){
+            if(canD && canP){
+                return true;
+            }
+            else if(canD && !canP){
+                if((x != locX && y != locX) && (((x - locX) == (y - locY)))){
+                    return true;
+                }
+                return false;
+            }
+            else if(!canD && canP){
+                if(((x == locX) || (y== locY))){
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        return false;
     }
 }

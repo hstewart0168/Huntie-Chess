@@ -8,7 +8,7 @@ public class Board {
             if (i == 0) {
                 for (int j = 0; j < board[i].length; j++) {
                     if (j == 0 || j == 7) {
-                        board[i][j] = new Piece("pawn", i, j, true);
+                        board[i][j] = new Piece("rook", i, j, true);
                     } else if (j == 1 || j == 6) {
                         board[i][j] = new Piece("knight", i, j, true);
                     } else if (j == 2 || j == 5) {
@@ -23,7 +23,7 @@ public class Board {
             else if (i == 7) {
                 for (int j = 0; j < board[i].length; j++) {
                     if (j == 0 || j == 7) {
-                        board[i][j] = new Piece("pawn", i, j, false);
+                        board[i][j] = new Piece("rook", i, j, false);
                     } else if (j == 1 || j == 6) {
                         board[i][j] = new Piece("knight", i, j, false);
                     } else if (j == 2 || j == 5) {

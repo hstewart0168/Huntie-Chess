@@ -5,6 +5,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -23,10 +25,14 @@ public class Main extends Application {
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
                 if(Board.board[x][y] != null) {
-                    pane.add(new ImageView(Board.board[x][y].getImage()), y, x, 1, 1);
+                    ToggleButton button = new ToggleButton();
+                    button.setGraphic(new ImageView(Board.board[x][y].getImage()));
+                    pane.add(button, x, y, 1, 1);
                 }
                 else{
-                    pane.add(new ImageView(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blankSpace.png")))), y, x, 1, 1);
+                    ToggleButton button = new ToggleButton();
+                    button.setGraphic(new ImageView(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blankSpace.png")))));
+                    pane.add(button, x, y, 1, 1);
                 }
             }
         }
@@ -56,6 +62,7 @@ public class Main extends Application {
 
         stage.setResizable(false);
         stage.setTitle("Huntie Chess");
+        stage.getIcons().add(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackPawn.png"))));
         stage.setScene(scene);
         stage.show();
     }
