@@ -40,7 +40,7 @@ public class Main extends Application {
                     pane.add(new ImageView(Board.board[x][y].getImage()), x, y, 1, 1);
                 }
                 else{
-                    pane.add(new ImageView(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blankSpace.png")))), x, y, 1, 1);
+                    pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), x, y, 1, 1);
                 }
             }
         }
@@ -49,16 +49,16 @@ public class Main extends Application {
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
                 if(x % 2 == 0 && y % 2 != 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), y, x, 1, 1);
                 }
                 else if(x % 2 != 0 && y % 2 != 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\greenTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), y, x, 1, 1);
                 }
                 else if(x % 2 == 0 && y % 2 == 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\greenTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), y, x, 1, 1);
                 }
                 else if(x % 2 != 0 && y % 2 == 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), y, x, 1, 1);
                 }
             }
         }
@@ -91,7 +91,7 @@ public class Main extends Application {
 
         stage.setResizable(false);
         stage.setTitle("Huntie Chess");
-        stage.getIcons().add(new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackPawn.png"))));
+        stage.getIcons().add(new Image(new FileInputStream(new File("Sprites\\blackPawn.png"))));
         stage.setScene(scene);
         stage.show();
     }

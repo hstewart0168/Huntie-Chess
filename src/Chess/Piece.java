@@ -2,11 +2,9 @@ package Chess;
 
 import javafx.scene.image.Image;
 
-import javax.imageio.stream.FileImageInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class Piece {
     private String type;
@@ -71,45 +69,45 @@ public class Piece {
     public Image getImage() throws FileNotFoundException {
         if(enemy) {
             if(type.equals("king")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackKing.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\blackKing.png"))));
             }
             else if(type.equals("bishop")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackBishop.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\blackBishop.png"))));
             }
             else if(type.equals("pawn")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackPawn.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\blackPawn.png"))));
             }
             else if(type.equals("knight")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackKnight.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\blackKnight.png"))));
             }
             else if(type.equals("queen")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackQueen.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\blackQueen.png"))));
             }
             else if(type.equals("rook")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blackRook.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\blackRook.png"))));
             }
         }
         else{
             if(type.equals("king")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteKing.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\whiteKing.png"))));
             }
             else if(type.equals("bishop")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteBishop.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\whiteBishop.png"))));
             }
             else if(type.equals("pawn")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whitePawn.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\whitePawn.png"))));
             }
             else if(type.equals("knight")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteKnight.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\whiteKnight.png"))));
             }
             else if(type.equals("queen")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteQueen.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\whiteQueen.png"))));
             }
             else if(type.equals("rook")) {
-                return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\whiteRook.png"))));
+                return (new Image(new FileInputStream(new File("Sprites\\whiteRook.png"))));
             }
         }
-        return (new Image(new FileInputStream(new File("src\\Chess\\Sprites\\blankSpace.png"))));
+        return (new Image(new FileInputStream(new File("Sprites\\blankSpace.png"))));
     }
 
     public boolean checkEligibility(int x, int y){
