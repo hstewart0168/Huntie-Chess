@@ -43,10 +43,13 @@ public class Piece {
             maxX = 2;
             maxY = 2;
             canP = true;
+            canD = false;
         }
         else if(type.equals("pawn")){
-            maxX = 0;
-            maxY = 1;
+            maxX = 2;
+            maxY = 0;
+            canP = true;
+            canD = false;
         }
         locX = x;
         locY = y;
@@ -110,26 +113,127 @@ public class Piece {
         return (new Image(new FileInputStream(new File("Sprites\\blankSpace.png"))));
     }
 
-    public boolean checkEligibility(int x, int y){
+    public boolean checkEligibility(int x, int y) {
+
+        int xpieceLocation = 0, xpieceLocation2 = 0;
+        int ypieceLocation = 0, ypieceLocation2 = 0;
+        int dxpieceLocation1 = 0, dxpieceLocation2 = 0, dxpieceLocation3 = 0, dxpieceLocation4 = 0;
+        int dypieceLocation1 = 0, dypieceLocation2 = 0, dypieceLocation3 = 0, dypieceLocation4 = 0;
+        for (int i = locX; i < Board.board.length; i++) {
+            if (Board.board[i][0] != null) {
+                xpieceLocation = i;
+                break;
+            }
+            xpieceLocation = i;
+        }
+        for (int i = locX; i >= 0; i--) {
+            if (Board.board[i][0] != null) {
+                xpieceLocation2 = i;
+                break;
+            }
+            xpieceLocation2 = i;
+        }
+        for (int i = locY; i < Board.board.length; i++) {
+            if (Board.board[i][0] != null) {
+                ypieceLocation = i;
+                break;
+            }
+            ypieceLocation = i;
+        }
+        for (int i = locY; i >= 0; i--) {
+            if (Board.board[i][0] != null) {
+                ypieceLocation2 = i;
+                break;
+            }
+            ypieceLocation2 = i;
+        }
+        for (int i = locX; i < Board.board.length; i++){
+            for (int j = locY; j < Board.board.length; j++) {
+                if (Board.board[i][i] != null) {
+                    dxpieceLocation1 = i;
+                    dypieceLocation1 = j;
+                    break;
+                }
+                dxpieceLocation1 = i;
+                dypieceLocation1 = j;
+            }
+        }
+        for (int i = locX; i < Board.board.length; i++){
+            for (int j = locY; j > 0; j--) {
+                if (Board.board[i][i] != null) {
+                    dxpieceLocation2 = i;
+                    dypieceLocation2 = j;
+                    break;
+                }
+                dxpieceLocation2 = i;
+                dypieceLocation2 = j;
+            }
+        }
+        for (int i = locX; i > 0; i--){
+            for (int j = locY; j < Board.board.length; j++) {
+                if (Board.board[i][i] != null) {
+                    dxpieceLocation3 = i;
+                    dypieceLocation3 = j;
+                    break;
+                }
+                dxpieceLocation3 = i;
+                dypieceLocation3 = j;
+            }
+        }
+        for (int i = locX; i > 0; i--){
+            for (int j = locY; j > 0; j--) {
+                if (Board.board[i][i] != null) {
+                    dxpieceLocation4 = i;
+                    dypieceLocation4 = j;
+                    break;
+                }
+                dxpieceLocation4 = i;
+                dypieceLocation4 = j;
+            }
+        }
+
         if(type.equals("knight")){
-            if((((x - locX) == 2) && ((y - locY) == 1)) || ((x - locX) == 1) && ((y - locY) == 2)){
-                return true;
+            if(((Math.abs((x - locX)) == 2) && (Math.abs((y - locY)) == 1)) || ((Math.abs((x - locX)) == 1) && (Math.abs((y - locY)) == 2))){
+                if(Board.board[x][y] == null)
+                    return true;
             }
             return false;
         }
-        else if(((x - locX) <= maxX) && ((y - locY) <= maxY)){
-            if(canD && canP){
-                return true;
-            }
-            else if(canD && !canP){
-                if((x != locX && y != locX) && (((x - locX) == (y - locY)))){
-                    return true;
+        else if(type.equals("pawn")){
+            if(enemy){
+                if(((x - locX) <= maxX)&& (x - locX) > 0 && (y - locY) == 0){
+                    if(Board.board[x][y] == null)
+                        return true;
                 }
                 return false;
             }
-            else if(!canD && canP){
+            else{
+                if(((locX - x) <= maxX)&& (locX - x) > 0 && (y - locY) == 0){
+                    if(Board.board[x][y] == null)
+                        return true;
+                }
+                return false;
+            }
+
+        }
+        else if(((Math.abs((x - locX)) <= maxX) && (Math.abs((y - locY)) <= maxY))){
+            if(canD && canP){
+                if(((x == locX) || (y== locY)) || ((Math.abs((x - locX)) == Math.abs((y - locY))))) {
+                    if((x < dxpieceLocation1 && y < dypieceLocation1) && (x < dxpieceLocation2 && y > dypieceLocation2) && (x > dxpieceLocation3 && y < dypieceLocation3) && (x > dxpieceLocation4 && y > dypieceLocation4) && y < ypieceLocation && x < xpieceLocation && x > xpieceLocation2 && y > ypieceLocation2)
+                        return true;
+                }
+            }
+            else if(canD){
+                if((x != locX && y != locY) && (Math.abs((x - locX)) == Math.abs((y - locY)))){
+                    if((x < dxpieceLocation1 && y < dypieceLocation1) && (x < dxpieceLocation2 && y > dypieceLocation2) && (x > dxpieceLocation3 && y < dypieceLocation3) && (x > dxpieceLocation4 && y > dypieceLocation4))
+                        return true;
+                }
+                return false;
+            }
+            else if(canP){
                 if(((x == locX) || (y== locY))){
-                    return true;
+                    if(y < ypieceLocation && x < xpieceLocation && x > xpieceLocation2 && y > ypieceLocation2)
+                        return true;
                 }
                 return false;
             }

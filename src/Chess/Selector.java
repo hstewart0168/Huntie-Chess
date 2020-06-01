@@ -18,26 +18,24 @@ public class Selector extends Rectangle{
         y = 0;
     }
 
-    public void addXCoord(double i) {
-        x += i;
+    public double getYCoord() {
+        return y;
+    }
+    public void addYCoord(double i) {
+        y += i;
     }
 
     public double getXCoord() {
         return x;
     }
-
-    public void addYCoord(double i) {
-        y += i;
+    public void addXCoord(double i) {
+        x += i;
     }
 
-    public double getYCoord() {
-        return y;
-    }
 
     public double getArrayX() {
         return x / 32;
     }
-
     public double getArrayY() {
         return y / 32;
     }

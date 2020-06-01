@@ -23,6 +23,7 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
@@ -86,6 +87,25 @@ public class Main extends Application {
                     selector.addYCoord(32);
                     selector.setTranslateY(selector.getYCoord());
                 }
+                else if(event.getCode() == KeyCode.SPACE){
+                    if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()] != null) {
+                        selector.setFill(Color.LIGHTBLUE);
+                        for(int x = 0; x < Board.board.length; x++){
+                            Group overlay = new Group();
+                            for(int y = 0; y < Board.board[x].length; y++){
+                                if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()].checkEligibility(x, y)){
+                                    Rectangle rectangle = new Rectangle(32,32);
+                                    rectangle.setTranslateX(x * 32);
+                                    rectangle.setTranslateY(y * 32);
+                                    rectangle.setFill(Color.DARKRED);
+                                    rectangle.setOpacity(.5);
+                                    overlay.getChildren().add(rectangle);
+                                }
+                            }
+                            root.getChildren().add(overlay);
+                        }
+                    }
+                }
             }
         });
 
@@ -94,6 +114,7 @@ public class Main extends Application {
         stage.getIcons().add(new Image(new FileInputStream(new File("Sprites\\blackPawn.png"))));
         stage.setScene(scene);
         stage.show();
+
     }
 
 
