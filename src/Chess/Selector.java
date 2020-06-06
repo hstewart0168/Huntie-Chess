@@ -34,9 +34,9 @@ public class Selector extends Rectangle{
 
 
     public double getArrayX() {
-        return x / 32;
+        return (int)(x / 32);
     }
     public double getArrayY() {
-        return y / 32;
+        return (int)(y / 32);
     }
 }

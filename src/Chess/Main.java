@@ -23,18 +23,18 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class Main extends Application {
-
     public void start(Stage stage) throws Exception{
+
         Selector selector = new Selector();
         selector.setWidth(32);
         selector.setHeight(32);
         selector.setFill(Color.LIME);
         selector.setOpacity(.5);
 
-        GridPane pane = new GridPane();
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
                 if(Board.board[x][y] != null) {
@@ -64,7 +64,7 @@ public class Main extends Application {
             }
         }
 
-        Group root = new Group(backPane, pane, selector);
+        Group root = new Group(backPane, pane, selector, overlay);
 
         Scene scene = new Scene(root, 256, 256);
         scene.setFill(Color.BEIGE);
@@ -87,11 +87,10 @@ public class Main extends Application {
                     selector.addYCoord(32);
                     selector.setTranslateY(selector.getYCoord());
                 }
-                else if(event.getCode() == KeyCode.SPACE){
+                else if(event.getCode() == KeyCode.SPACE && !spacePressed){
                     if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()] != null) {
                         selector.setFill(Color.LIGHTBLUE);
                         for(int x = 0; x < Board.board.length; x++){
-                            Group overlay = new Group();
                             for(int y = 0; y < Board.board[x].length; y++){
                                 if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()].checkEligibility(x, y)){
                                     Rectangle rectangle = new Rectangle(32,32);
@@ -102,8 +101,44 @@ public class Main extends Application {
                                     overlay.getChildren().add(rectangle);
                                 }
                             }
-                            root.getChildren().add(overlay);
                         }
+                        selected = Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()];
+                        spacePressed = true;
+                    }
+                }
+                else if(event.getCode() == KeyCode.SPACE && spacePressed) {
+                    root.getChildren().remove(overlay);
+                    overlay = new Group();
+                    root.getChildren().add(overlay);
+                    spacePressed = false;
+                    selector.setFill(Color.LIME);
+                    if(selected.checkEligibility((int)selector.getArrayX(), (int)selector.getArrayY())){
+                        System.out.println("valid move");
+                        selected.move((int)selector.getArrayX(), (int)selector.getArrayY());
+                        root.getChildren().remove(pane);
+                        pane = new GridPane();
+                        for (int x = 0; x < Board.board.length; x++){
+                            for(int y = 0; y <Board.board[x].length; y++) {
+                                if(Board.board[x][y] != null) {
+                                    try {
+                                        pane.add(new ImageView(Board.board[x][y].getImage()), x, y, 1, 1);
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                else{
+                                    try {
+                                        pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), x, y, 1, 1);
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                        root.getChildren().add(pane);
+                    }
+                    else{
+                        System.out.println("invalid move");
                     }
                 }
             }
@@ -114,7 +149,6 @@ public class Main extends Application {
         stage.getIcons().add(new Image(new FileInputStream(new File("Sprites\\blackPawn.png"))));
         stage.setScene(scene);
         stage.show();
-
     }
 
 
@@ -122,4 +156,10 @@ public class Main extends Application {
         Board.initializeBoard();
         launch(args);
     }
+
+    private static boolean spacePressed = false;
+    private static Group overlay = new Group();
+    private static Piece selected;
+    private static GridPane pane = new GridPane();
+
 }

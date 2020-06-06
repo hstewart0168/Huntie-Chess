@@ -114,82 +114,8 @@ public class Piece {
     }
 
     public boolean checkEligibility(int x, int y) {
-
-        int xpieceLocation = 0, xpieceLocation2 = 0;
-        int ypieceLocation = 0, ypieceLocation2 = 0;
-        int dxpieceLocation1 = 0, dxpieceLocation2 = 0, dxpieceLocation3 = 0, dxpieceLocation4 = 0;
-        int dypieceLocation1 = 0, dypieceLocation2 = 0, dypieceLocation3 = 0, dypieceLocation4 = 0;
-        for (int i = locX; i < Board.board.length; i++) {
-            if (Board.board[i][0] != null) {
-                xpieceLocation = i;
-                break;
-            }
-            xpieceLocation = i;
-        }
-        for (int i = locX; i >= 0; i--) {
-            if (Board.board[i][0] != null) {
-                xpieceLocation2 = i;
-                break;
-            }
-            xpieceLocation2 = i;
-        }
-        for (int i = locY; i < Board.board.length; i++) {
-            if (Board.board[i][0] != null) {
-                ypieceLocation = i;
-                break;
-            }
-            ypieceLocation = i;
-        }
-        for (int i = locY; i >= 0; i--) {
-            if (Board.board[i][0] != null) {
-                ypieceLocation2 = i;
-                break;
-            }
-            ypieceLocation2 = i;
-        }
-        for (int i = locX; i < Board.board.length; i++){
-            for (int j = locY; j < Board.board.length; j++) {
-                if (Board.board[i][i] != null) {
-                    dxpieceLocation1 = i;
-                    dypieceLocation1 = j;
-                    break;
-                }
-                dxpieceLocation1 = i;
-                dypieceLocation1 = j;
-            }
-        }
-        for (int i = locX; i < Board.board.length; i++){
-            for (int j = locY; j > 0; j--) {
-                if (Board.board[i][i] != null) {
-                    dxpieceLocation2 = i;
-                    dypieceLocation2 = j;
-                    break;
-                }
-                dxpieceLocation2 = i;
-                dypieceLocation2 = j;
-            }
-        }
-        for (int i = locX; i > 0; i--){
-            for (int j = locY; j < Board.board.length; j++) {
-                if (Board.board[i][i] != null) {
-                    dxpieceLocation3 = i;
-                    dypieceLocation3 = j;
-                    break;
-                }
-                dxpieceLocation3 = i;
-                dypieceLocation3 = j;
-            }
-        }
-        for (int i = locX; i > 0; i--){
-            for (int j = locY; j > 0; j--) {
-                if (Board.board[i][i] != null) {
-                    dxpieceLocation4 = i;
-                    dypieceLocation4 = j;
-                    break;
-                }
-                dxpieceLocation4 = i;
-                dypieceLocation4 = j;
-            }
+        if(Board.board[x][y] == this){
+            return false;
         }
 
         if(type.equals("knight")){
@@ -217,23 +143,161 @@ public class Piece {
 
         }
         else if(((Math.abs((x - locX)) <= maxX) && (Math.abs((y - locY)) <= maxY))){
-            if(canD && canP){
-                if(((x == locX) || (y== locY)) || ((Math.abs((x - locX)) == Math.abs((y - locY))))) {
-                    if((x < dxpieceLocation1 && y < dypieceLocation1) && (x < dxpieceLocation2 && y > dypieceLocation2) && (x > dxpieceLocation3 && y < dypieceLocation3) && (x > dxpieceLocation4 && y > dypieceLocation4) && y < ypieceLocation && x < xpieceLocation && x > xpieceLocation2 && y > ypieceLocation2)
-                        return true;
+            if(canD && canP) {
+                if (y == locY) {
+                    if (x < locX) {
+                        for (int i = locX; i > x; i--) {
+                            if (Board.board[i][y] != null && Board.board[i][y] != this) {
+                                return false;
+                            }
+                        }
+                    } else if (x > locX) {
+                        for (int i = locX; i < x; i++) {
+                            if (Board.board[i][y] != null && Board.board[i][y] != this) {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                } else if (x == locX) {
+                    if (y < locY) {
+                        for (int i = locY; i > y; i--) {
+                            if (Board.board[x][i] != null && Board.board[x][i] != this) {
+                                return false;
+                            }
+                        }
+                    } else if (y > locY) {
+                        for (int i = locY; i < y; i++) {
+                            if (Board.board[x][i] != null && Board.board[x][i] != this) {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
                 }
-            }
-            else if(canD){
                 if((x != locX && y != locY) && (Math.abs((x - locX)) == Math.abs((y - locY)))){
-                    if((x < dxpieceLocation1 && y < dypieceLocation1) && (x < dxpieceLocation2 && y > dypieceLocation2) && (x > dxpieceLocation3 && y < dypieceLocation3) && (x > dxpieceLocation4 && y > dypieceLocation4))
+                    if(x > locX && y > locY) {
+                        for (int i = locX; i < x; i++) {
+                            for (int j = locY; j < y; j++) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
                         return true;
+                    }
+                    else if(x < locX && y < locY) {
+                        for (int i = locX; i > x; i--) {
+                            for (int j = locY; j > y; j--) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    else if(x > locX) {
+                        for (int i = locX; i < x; i++) {
+                            for (int j = locY; j > y; j--) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    else {
+                        for (int i = locX; i > x; i--) {
+                            for (int j = locY; j < y; j++) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
                 }
                 return false;
             }
-            else if(canP){
-                if(((x == locX) || (y== locY))){
-                    if(y < ypieceLocation && x < xpieceLocation && x > xpieceLocation2 && y > ypieceLocation2)
+            if(canD){
+                if((x != locX && y != locY) && (Math.abs((x - locX)) == Math.abs((y - locY)))){
+                    if(x > locX && y > locY) {
+                        for (int i = locX; i < x; i++) {
+                            for (int j = locY; j < y; j++) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
                         return true;
+                    }
+                    else if(x < locX && y < locY) {
+                        for (int i = locX; i > x; i--) {
+                            for (int j = locY; j > y; j--) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    else if(x > locX) {
+                        for (int i = locX; i < x; i++) {
+                            for (int j = locY; j > y; j--) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    else {
+                        for (int i = locX; i > x; i--) {
+                            for (int j = locY; j < y; j++) {
+                                if (Board.board[i][j] != null && Board.board[i][j] != this && (Math.abs((x - i)) == Math.abs((y - j)))) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+            if(canP){
+                if(y == locY){
+                    if(x < locX){
+                        for(int i = locX; i > x; i--){
+                            if(Board.board[i][y] != null && Board.board[i][y] != this){
+                                return false;
+                            }
+                        }
+                    }
+                    else if(x > locX){
+                        for(int i = locX; i < x; i++){
+                            if(Board.board[i][y] != null && Board.board[i][y] != this){
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+                else if(x == locX){
+                    if(y < locY){
+                        for(int i = locY; i > y; i--){
+                            if(Board.board[x][i] != null && Board.board[x][i] != this){
+                                return false;
+                            }
+                        }
+                    }
+                    else if(y > locY){
+                        for(int i = locY; i < y; i++){
+                            if(Board.board[x][i] != null && Board.board[x][i] != this){
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
                 }
                 return false;
             }
