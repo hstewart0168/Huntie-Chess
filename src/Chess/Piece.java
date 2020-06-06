@@ -122,8 +122,9 @@ public class Piece {
             if(((Math.abs((x - locX)) == 2) && (Math.abs((y - locY)) == 1)) || ((Math.abs((x - locX)) == 1) && (Math.abs((y - locY)) == 2))){
                 if(Board.board[x][y] == null)
                     return true;
+                else if(Board.board[x][y].getState() != this.getState())
+                    return true;
             }
-            return false;
         }
         else if(type.equals("pawn")){
             if(enemy){
@@ -158,7 +159,10 @@ public class Piece {
                             }
                         }
                     }
-                    return true;
+                    if(Board.board[x][y] == null)
+                        return true;
+                    else if(Board.board[x][y].getState() != this.getState())
+                        return true;
                 } else if (x == locX) {
                     if (y < locY) {
                         for (int i = locY; i > y; i--) {
@@ -173,7 +177,10 @@ public class Piece {
                             }
                         }
                     }
-                    return true;
+                    if(Board.board[x][y] == null)
+                        return true;
+                    else if(Board.board[x][y].getState() != this.getState())
+                        return true;
                 }
                 if((x != locX && y != locY) && (Math.abs((x - locX)) == Math.abs((y - locY)))){
                     if(x > locX && y > locY) {
@@ -184,7 +191,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                     else if(x < locX && y < locY) {
                         for (int i = locX; i > x; i--) {
@@ -194,7 +204,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                     else if(x > locX) {
                         for (int i = locX; i < x; i++) {
@@ -204,7 +217,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                     else {
                         for (int i = locX; i > x; i--) {
@@ -214,7 +230,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                 }
                 return false;
@@ -229,7 +248,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                     else if(x < locX && y < locY) {
                         for (int i = locX; i > x; i--) {
@@ -239,7 +261,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                     else if(x > locX) {
                         for (int i = locX; i < x; i++) {
@@ -249,7 +274,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                     else {
                         for (int i = locX; i > x; i--) {
@@ -259,7 +287,10 @@ public class Piece {
                                 }
                             }
                         }
-                        return true;
+                        if(Board.board[x][y] == null)
+                            return true;
+                        else if(Board.board[x][y].getState() != this.getState())
+                            return true;
                     }
                 }
                 return false;
@@ -280,7 +311,10 @@ public class Piece {
                             }
                         }
                     }
-                    return true;
+                    if(Board.board[x][y] == null)
+                        return true;
+                    else if(Board.board[x][y].getState() != this.getState())
+                        return true;
                 }
                 else if(x == locX){
                     if(y < locY){
@@ -297,7 +331,10 @@ public class Piece {
                             }
                         }
                     }
-                    return true;
+                    if(Board.board[x][y] == null)
+                        return true;
+                    else if(Board.board[x][y].getState() != this.getState())
+                        return true;
                 }
                 return false;
             }
@@ -305,4 +342,12 @@ public class Piece {
         }
         return false;
     }
+
+
+
+    private boolean getState() {
+        return enemy;
+    }
+
+
 }
