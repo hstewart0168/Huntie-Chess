@@ -30,7 +30,7 @@ public class Piece {
                 maxX = 1;
                 maxY = 1;
                 canP = true;
-                canD = false;
+                canD = true;
             }
             case "bishop" -> {
                 maxX = 7;
