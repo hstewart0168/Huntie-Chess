@@ -10,10 +10,14 @@ public class Piece {
     private final String type;
     private int maxX, maxY;
     private int locX, locY;
-    boolean enemy, canD, canP;
+    private int firstMove;
+    boolean enemy, canD, canP, unMoved;
+
+    private static int turn = 1;
 
     public Piece(String type, int x, int y, boolean e){
         enemy = e;
+        unMoved = true;
         this.type = type;
         switch (type) {
             case "queen" -> {
@@ -58,10 +62,40 @@ public class Piece {
     }
 
     public void move(int newX, int newY){
+        turn++;
+        if(type.equals("king") && locY == 4 && unMoved){
+            if(newX == locX && newY == 6){
+                Board.board[locX][7].move(locX,5);
+            }
+            else if(newX == locX && newY == 2){
+                Board.board[locX][0].move(locX, 3);
+            }
+        }
+
+        if(type.equals("pawn") && enemy && (locX == newX - 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX - 1][newY] != null){
+            if(Board.board[newX - 1][newY].getType().equals("pawn")){
+                Board.board[newX - 1][newY] = null;
+            }
+        }
+
+        if(type.equals("pawn") && !enemy && (locX == newX + 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX + 1][newY] != null){
+            if(Board.board[newX + 1][newY].getType().equals("pawn")){
+                Board.board[newX + 1][newY] = null;
+            }
+        }
+
         Board.board[newX][newY] = this;
         Board.board[locX][locY] = null;
         locX = newX;
         locY = newY;
+        if(unMoved){
+            firstMove = turn;
+        }
+        if(type.equals("pawn")) {
+            maxX = 1;
+        }
+
+        unMoved = false;
     }
 
     public Image getImage() throws FileNotFoundException {
@@ -101,8 +135,24 @@ public class Piece {
     }
 
     public boolean checkEligibility(int x, int y) {
-        if(Board.board[x][y] == this){
+        if (Board.board[x][y] == this) {
             return false;
+        }
+
+        if (Board.board[locX][7] != null){
+            if (type.equals("king") && Board.board[locX][7].getType().equals("rook") && unMoved && Board.board[locX][7].isUnMoved()) {
+                if (x == locX && y == 6 && Board.board[locX][6] == null && Board.board[locX][5] == null) {
+                    return true;
+                }
+            }
+        }
+
+        if (Board.board[locX][0] != null){
+            if (type.equals("king") && Board.board[locX][0].getType().equals("rook") && unMoved && Board.board[locX][0].isUnMoved()) {
+                if (x == locX && y == 2 && Board.board[locX][3] == null && Board.board[locX][2] == null && Board.board[locX][1] == null) {
+                    return true;
+                }
+            }
         }
 
         if(type.equals("knight")){
@@ -115,16 +165,59 @@ public class Piece {
         else if(type.equals("pawn")){
             if(enemy){
                 if(((x - locX) <= maxX)&& (x - locX) > 0 && (y - locY) == 0){
-                    return Board.board[x][y] == null;
+                    if (Board.board[x][y] == null)
+                        return true;
+                }
+                if(Board.board[x][y] != null && x == locX + 1 && (y == locY - 1 || y == locY + 1) && Board.board[x][y].getState() != enemy){
+                    return true;
+                }
+                if(locX == 4 && y != 0 && x != 0) {
+                    if(locX == x - 1 && locY == y - 1) {
+                        if (Board.board[x - 1][y] != null) {
+                            if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != enemy && Board.board[x - 1][y].getFirstMove() == turn) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                if(locX == 4 && y != 7 && x != 7) {
+                    if(locX == x - 1 && locY == y + 1) {
+                        if (Board.board[x - 1][y] != null) {
+                            if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != enemy && Board.board[x - 1][y].getFirstMove() == turn) {
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
             else{
                 if(((locX - x) <= maxX)&& (locX - x) > 0 && (y - locY) == 0){
-                    return Board.board[x][y] == null;
+                    if (Board.board[x][y] == null)
+                        return true;
+                }
+                if(Board.board[x][y] != null && x == locX - 1 && (y == locY - 1 || y == locY + 1) && Board.board[x][y].getState() != enemy){
+                    return true;
+                }
+                if(locX == 3 && y != 0 && x != 0) {
+                    if(locX == x + 1 && locY == y - 1) {
+                        if (Board.board[x + 1][y] != null) {
+                            if (Board.board[x + 1][y].getType().equals("pawn") && Board.board[x + 1][y].getState() != enemy && Board.board[x + 1][y].getFirstMove() == turn) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                if(locX == 3 && y != 7 && x != 7) {
+                    if(locX == x + 1 && locY == y + 1) {
+                        if (Board.board[x + 1][y] != null) {
+                            if (Board.board[x + 1][y].getType().equals("pawn") && Board.board[x + 1][y].getState() != enemy && Board.board[x + 1][y].getFirstMove() == turn) {
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
             return false;
-
         }
         else if(((Math.abs((x - locX)) <= maxX) && (Math.abs((y - locY)) <= maxY))){
             if(canD && canP) {
@@ -316,11 +409,20 @@ public class Piece {
         return false;
     }
 
+    private int getFirstMove() {
+        return firstMove;
+    }
 
 
     private boolean getState() {
         return enemy;
     }
 
+    private String getType(){
+        return type;
+    }
 
+    private boolean isUnMoved(){
+        return unMoved;
+    }
 }
