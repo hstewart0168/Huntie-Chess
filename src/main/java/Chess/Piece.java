@@ -146,19 +146,6 @@ public class Piece {
     }
 
     public boolean checkEligibility(int x, int y, boolean first) {
-        if (Main.whiteKing.inCheck() && Main.whiteTurn) {
-            Piece checker = null;
-            for(Piece piece : Main.whiteKing.checkingPieces){
-                piece.inCheck();
-                checker = piece;
-            }
-            if (this == Main.whiteKing){
-            }
-            else if(checker != null && checker.getCheckingPieces().contains(Board.board[x][y])){
-
-            }
-        }
-
         if (Board.board[x][y] == this) {
             return false;
         }
