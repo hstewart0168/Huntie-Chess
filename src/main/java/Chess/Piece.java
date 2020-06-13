@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class Piece {
     private final String type;
@@ -12,6 +13,9 @@ public class Piece {
     private int locX, locY;
     private int firstMove;
     boolean enemy, canD, canP, unMoved;
+    ArrayList<Piece> checkingPieces;
+    Piece checker;
+
 
     private static int turn = 1;
 
@@ -19,6 +23,7 @@ public class Piece {
         enemy = e;
         unMoved = true;
         this.type = type;
+        checkingPieces = new ArrayList<Piece>();
         switch (type) {
             case "queen" -> {
                 maxX = 7;
@@ -71,13 +76,13 @@ public class Piece {
             }
         }
 
-        if(type.equals("pawn") && enemy && (locX == newX - 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX - 1][newY] != null){
+        if(type.equals("pawn") && !enemy && (locX == newX - 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX - 1][newY] != null){
             if(Board.board[newX - 1][newY].getType().equals("pawn") && Board.board[newX - 1][newY].getFirstMove() == turn - 1){
                 Board.board[newX - 1][newY] = null;
             }
         }
 
-        if(type.equals("pawn") && !enemy && (locX == newX + 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX + 1][newY] != null){
+        if(type.equals("pawn") && enemy && (locX == newX + 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX + 1][newY] != null){
             if(Board.board[newX + 1][newY].getType().equals("pawn") && Board.board[newX + 1][newY].getFirstMove() == turn - 1){
                 Board.board[newX + 1][newY] = null;
             }
@@ -140,9 +145,28 @@ public class Piece {
         return (new Image(new FileInputStream(new File("Sprites\\blankSpace.png"))));
     }
 
-    public boolean checkEligibility(int x, int y) {
+    public boolean checkEligibility(int x, int y, boolean first) {
+        if (Main.whiteKing.inCheck() && Main.whiteTurn) {
+            Piece checker = null;
+            for(Piece piece : Main.whiteKing.checkingPieces){
+                piece.inCheck();
+                checker = piece;
+            }
+            if (this == Main.whiteKing){
+            }
+            else if(checker != null && checker.getCheckingPieces().contains(Board.board[x][y])){
+
+            }
+        }
+
         if (Board.board[x][y] == this) {
             return false;
+        }
+
+        if (type.equals("king") && first){
+            if(underSiege(x,y)){
+                return false;
+            }
         }
 
         if (Board.board[locX][7] != null){
@@ -169,7 +193,7 @@ public class Piece {
             }
         }
         else if(type.equals("pawn")){
-            if(enemy){
+            if(!enemy){
                 if(((x - locX) <= maxX)&& (x - locX) > 0 && (y - locY) == 0){
                     if (Board.board[x][y] == null && (Board.board[x - 1][y] == null || Board.board[x - 1][y] == this))
                         return true;
@@ -415,20 +439,71 @@ public class Piece {
         return false;
     }
 
+    public boolean canMove(){
+        for(int x = 0; x < Board.board.length; x++){
+            for(int y = 0; y < Board.board[x].length; y++){
+                if(this.checkEligibility(x, y, true)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private int getFirstMove() {
         return firstMove;
     }
 
 
-    private boolean getState() {
+    public boolean getState() {
         return enemy;
     }
 
-    private String getType(){
+    public String getType(){
         return type;
     }
 
     private boolean isUnMoved(){
         return unMoved;
+    }
+
+    public boolean inCheck(){
+        checkingPieces.clear();
+        for(int i = 0; i < Board.board.length; i++){
+            for(int j = 0; j < Board.board[i].length; j++){
+                if(Board.board[i][j] != null) {
+                    if (Board.board[i][j].getState() != getState() && Board.board[i][j].checkEligibility(locX, locY, true)) {
+                        checkingPieces.add(Board.board[i][j]);
+                        checker = Board.board[i][j];
+                    }
+                }
+            }
+        }
+        if(!checkingPieces.isEmpty()) {
+            System.out.println("check");
+            return true;
+        }
+        return false;
+    }
+
+    public boolean underSiege(int x, int y){
+        for(int i = 0; i < Board.board.length; i++){
+            for(int j = 0; j < Board.board[i].length; j++){
+                if(Board.board[i][j] != null) {
+                    if (Board.board[i][j].getState() != getState() && Board.board[i][j].checkEligibility(x, y, false)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<Piece> getCheckingPieces(){
+        return checkingPieces;
+    }
+
+    public Piece getChecker(){
+        return checker;
     }
 }

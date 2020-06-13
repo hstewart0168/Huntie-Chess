@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -17,6 +18,7 @@ import java.io.FileNotFoundException;
 
 public class Main extends Application {
     public void start(Stage stage) throws Exception{
+
 
         Selector selector = new Selector();
         selector.setWidth(32);
@@ -30,25 +32,29 @@ public class Main extends Application {
                     pane.add(new ImageView(Board.board[x][y].getImage()), x, y, 1, 1);
                 }
                 else{
-                    pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), x, y, 1, 1);
+                    pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), y, x, 1, 1);
                 }
             }
         }
+
+
+        whiteKing = Board.board[0][4];
+        blackKing = Board.board[7][4];
 
         GridPane backPane = new GridPane();
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
                 if(x % 2 == 0 && y % 2 != 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), x, y, 1, 1);
                 }
                 else if(x % 2 != 0 && y % 2 != 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), x, y, 1, 1);
                 }
                 else if(x % 2 == 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), x, y, 1, 1);
                 }
                 else {
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), y, x, 1, 1);
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), x, y, 1, 1);
                 }
             }
         }
@@ -58,7 +64,7 @@ public class Main extends Application {
         Scene scene = new Scene(root, 256, 256);
         scene.setFill(Color.BEIGE);
 
-        scene.setOnKeyPressed(event -> {
+        scene.setOnKeyPressed((KeyEvent event) -> {
             if(event.getCode() == KeyCode.D && selector.getArrayX() < 7){
                 selector.addXCoord(32);
                 selector.setTranslateX(selector.getXCoord());
@@ -76,22 +82,106 @@ public class Main extends Application {
                 selector.setTranslateY(selector.getYCoord());
             }
             else if(event.getCode() == KeyCode.SPACE && !spacePressed){
-                if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()] != null) {
-                    selector.setFill(Color.LIGHTBLUE);
-                    for(int x = 0; x < Board.board.length; x++){
-                        for(int y = 0; y < Board.board[x].length; y++){
-                            if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()].checkEligibility(x, y)){
-                                Rectangle rectangle = new Rectangle(32,32);
-                                rectangle.setTranslateX(x * 32);
-                                rectangle.setTranslateY(y * 32);
-                                rectangle.setFill(Color.DARKRED);
-                                rectangle.setOpacity(.5);
-                                overlay.getChildren().add(rectangle);
+                if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()] != null && Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()].getState() != whiteTurn) {
+                    if (whiteKing.inCheck() && whiteTurn) {
+                        if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()] == whiteKing){
+                            selector.setFill(Color.LIGHTBLUE);
+                            for (int x = 0; x < Board.board.length; x++) {
+                                for (int y = 0; y < Board.board[x].length; y++) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true)) {
+                                        Rectangle rectangle = new Rectangle(32, 32);
+                                        rectangle.setTranslateX(x * 32);
+                                        rectangle.setTranslateY(y * 32);
+                                        rectangle.setFill(Color.DARKRED);
+                                        rectangle.setOpacity(.5);
+                                        overlay.getChildren().add(rectangle);
+                                    }
+                                }
                             }
+                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
+                            spacePressed = true;
+                        }
+                        Piece checker = null;
+                        for(Piece piece : whiteKing.checkingPieces){
+                            piece.inCheck();
+                            checker = piece;
+                        }
+                        if(checker != null && checker.getCheckingPieces().contains(Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()])){
+                            selector.setFill(Color.LIGHTBLUE);
+                            for (int x = 0; x < Board.board.length; x++) {
+                                for (int y = 0; y < Board.board[x].length; y++) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true) && Board.board[x][y] == checker) {
+                                        Rectangle rectangle = new Rectangle(32, 32);
+                                        rectangle.setTranslateX(x * 32);
+                                        rectangle.setTranslateY(y * 32);
+                                        rectangle.setFill(Color.DARKRED);
+                                        rectangle.setOpacity(.5);
+                                        overlay.getChildren().add(rectangle);
+                                    }
+                                }
+                            }
+                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
+                            spacePressed = true;
                         }
                     }
-                    selected = Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()];
-                    spacePressed = true;
+                    else if (blackKing.inCheck() && !whiteTurn) {
+                        if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].getType().equals("king")) {
+                            selector.setFill(Color.LIGHTBLUE);
+                            for (int x = 0; x < Board.board.length; x++) {
+                                for (int y = 0; y < Board.board[x].length; y++) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true)) {
+                                        Rectangle rectangle = new Rectangle(32, 32);
+                                        rectangle.setTranslateX(x * 32);
+                                        rectangle.setTranslateY(y * 32);
+                                        rectangle.setFill(Color.DARKRED);
+                                        rectangle.setOpacity(.5);
+                                        overlay.getChildren().add(rectangle);
+                                    }
+                                }
+                            }
+                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
+                            spacePressed = true;
+                        }
+                        Piece checker = null;
+                        for(Piece piece : blackKing.checkingPieces){
+                            piece.inCheck();
+                            checker = piece;
+                        }
+                        if(checker != null && checker.getCheckingPieces().contains(Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()])){
+                            selector.setFill(Color.LIGHTBLUE);
+                            for (int x = 0; x < Board.board.length; x++) {
+                                for (int y = 0; y < Board.board[x].length; y++) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true) && Board.board[x][y] == checker) {
+                                        Rectangle rectangle = new Rectangle(32, 32);
+                                        rectangle.setTranslateX(x * 32);
+                                        rectangle.setTranslateY(y * 32);
+                                        rectangle.setFill(Color.DARKRED);
+                                        rectangle.setOpacity(.5);
+                                        overlay.getChildren().add(rectangle);
+                                    }
+                                }
+                            }
+                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
+                            spacePressed = true;
+                        }
+                    }
+                    else{
+                        selector.setFill(Color.LIGHTBLUE);
+                        for (int x = 0; x < Board.board.length; x++) {
+                            for (int y = 0; y < Board.board[x].length; y++) {
+                                if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true)) {
+                                    Rectangle rectangle = new Rectangle(32, 32);
+                                    rectangle.setTranslateX(x * 32);
+                                    rectangle.setTranslateY(y * 32);
+                                    rectangle.setFill(Color.DARKRED);
+                                    rectangle.setOpacity(.5);
+                                    overlay.getChildren().add(rectangle);
+                                }
+                            }
+                        }
+                        selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
+                        spacePressed = true;
+                    }
                 }
             }
             else if(event.getCode() == KeyCode.SPACE) {
@@ -100,7 +190,7 @@ public class Main extends Application {
                 root.getChildren().add(overlay);
                 spacePressed = false;
                 selector.setFill(Color.LIME);
-                if(selected.checkEligibility((int)selector.getArrayX(), (int)selector.getArrayY())){
+                if(selected.checkEligibility((int)selector.getArrayX(), (int)selector.getArrayY(), true)){
                     System.out.println("valid move");
                     selected.move((int)selector.getArrayX(), (int)selector.getArrayY());
                     root.getChildren().remove(pane);
@@ -124,6 +214,7 @@ public class Main extends Application {
                         }
                     }
                     root.getChildren().add(pane);
+                    whiteTurn = !whiteTurn;
                 }
                 else{
                     System.out.println("invalid move");
@@ -136,17 +227,61 @@ public class Main extends Application {
         stage.getIcons().add(new Image(new FileInputStream(new File("Sprites\\blackPawn.png"))));
         stage.setScene(scene);
         stage.show();
+
+        Runnable runnable = new Runnable() {
+            public void run() {
+                boolean endCondition = true;
+                while(endCondition){
+                    boolean checkMate = true;
+                    for(int x = 0; x < Board.board.length; x++){
+                        for(int y = 0; y < Board.board.length; y++){
+                            if(Board.board[x][y]!= null){
+                                if(whiteTurn){
+                                    if(Board.board[x][y].canMove() && !Board.board[x][y].getState()){
+                                        System.out.println("gay");
+                                        checkMate = false;
+                                    }
+                                }
+                                if(!whiteTurn){
+                                    if(Board.board[x][y].canMove() && Board.board[x][y].getState()){
+                                        System.out.println("boy");
+                                        checkMate = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(checkMate){
+                        endCondition = false;
+                    }
+                    try {
+                        gameThread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println("game end");
+            }
+        };
+
+        gameThread = new Thread(runnable);
+
+        gameThread.start();
     }
 
 
     public static void main(String[] args) {
         Board.initializeBoard();
         launch(args);
+        gameThread.stop();
     }
 
     private static boolean spacePressed = false;
     private static Group overlay = new Group();
     private static Piece selected;
     private static GridPane pane = new GridPane();
-
+    public static boolean whiteTurn = true;
+    private static Thread gameThread;
+    public static Piece whiteKing;
+    public static Piece blackKing;
 }
