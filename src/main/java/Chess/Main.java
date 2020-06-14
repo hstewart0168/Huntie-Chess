@@ -86,95 +86,6 @@ public class Main extends Application {
             }
             else if(event.getCode() == KeyCode.SPACE && !spacePressed){
                 if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()] != null && Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()].getState() != whiteTurn) {
-                    if (whiteKing.inCheck() && whiteTurn) {
-                        if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()] == whiteKing){
-                            selector.setFill(Color.LIGHTBLUE);
-                            for (int x = 0; x < Board.board.length; x++) {
-                                for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false)) {
-                                        Rectangle rectangle = new Rectangle(32, 32);
-                                        rectangle.setTranslateX(x * 32);
-                                        rectangle.setTranslateY(y * 32);
-                                        rectangle.setFill(Color.DARKRED);
-                                        rectangle.setOpacity(.5);
-                                        overlay.getChildren().add(rectangle);
-                                    }
-                                }
-                            }
-                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
-                            spacePressed = true;
-                        }
-                        Piece checker = null;
-                        for(Piece piece : whiteKing.checkingPieces){
-                            piece.inCheck();
-                            checker = piece;
-                        }
-                        if(checker != null && checker.getCheckingPieces().contains(Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()])){
-                            selector.setFill(Color.LIGHTBLUE);
-                            for (int x = 0; x < Board.board.length; x++) {
-                                for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false) && Board.board[x][y] == checker) {
-                                        Rectangle rectangle = new Rectangle(32, 32);
-                                        rectangle.setTranslateX(x * 32);
-                                        rectangle.setTranslateY(y * 32);
-                                        rectangle.setFill(Color.DARKRED);
-                                        rectangle.setOpacity(.5);
-                                        overlay.getChildren().add(rectangle);
-                                    }
-                                }
-                            }
-                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
-                            spacePressed = true;
-                        }
-                        else{
-                            wCheckmate.set(true);
-                        }
-                    }
-                    else if (blackKing.inCheck() && !whiteTurn) {
-                        if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].getType().equals("king")) {
-                            selector.setFill(Color.LIGHTBLUE);
-                            for (int x = 0; x < Board.board.length; x++) {
-                                for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false)) {
-                                        Rectangle rectangle = new Rectangle(32, 32);
-                                        rectangle.setTranslateX(x * 32);
-                                        rectangle.setTranslateY(y * 32);
-                                        rectangle.setFill(Color.DARKRED);
-                                        rectangle.setOpacity(.5);
-                                        overlay.getChildren().add(rectangle);
-                                    }
-                                }
-                            }
-                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
-                            spacePressed = true;
-                        }
-                        Piece checker = null;
-                        for(Piece piece : blackKing.checkingPieces){
-                            piece.inCheck();
-                            checker = piece;
-                        }
-                        if(checker != null && checker.getCheckingPieces().contains(Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()])){
-                            selector.setFill(Color.LIGHTBLUE);
-                            for (int x = 0; x < Board.board.length; x++) {
-                                for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false) && Board.board[x][y] == checker) {
-                                        Rectangle rectangle = new Rectangle(32, 32);
-                                        rectangle.setTranslateX(x * 32);
-                                        rectangle.setTranslateY(y * 32);
-                                        rectangle.setFill(Color.DARKRED);
-                                        rectangle.setOpacity(.5);
-                                        overlay.getChildren().add(rectangle);
-                                    }
-                                }
-                            }
-                            selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
-                            spacePressed = true;
-                        }
-                        else{
-                            bCheckmate.set(true);
-                        }
-                    }
-                    else{
                         selector.setFill(Color.LIGHTBLUE);
                         for (int x = 0; x < Board.board.length; x++) {
                             for (int y = 0; y < Board.board[x].length; y++) {
@@ -190,7 +101,6 @@ public class Main extends Application {
                         }
                         selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
                         spacePressed = true;
-                    }
                 }
             }
             else if(event.getCode() == KeyCode.SPACE) {

@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.sql.Savepoint;
 import java.util.ArrayList;
 
 public class Piece {
@@ -157,7 +158,7 @@ public class Piece {
         }
 
         if (Board.board[locX][7] != null){
-            if (type.equals("king") && Board.board[locX][7].getType().equals("rook") && unMoved && Board.board[locX][7].isUnMoved() && !test && !inCheck()) {
+            if (type.equals("king") && Board.board[locX][7].getType().equals("rook") && unMoved && Board.board[locX][7].isUnMoved() && !test && !saveKing()) {
                 if (x == locX && y == 6 && Board.board[locX][6] == null && Board.board[locX][5] == null) {
                     return testMove(x, y);
                 }
@@ -165,7 +166,7 @@ public class Piece {
         }
 
         if (Board.board[locX][0] != null){
-            if (type.equals("king") && Board.board[locX][0].getType().equals("rook") && unMoved && Board.board[locX][0].isUnMoved() && !test && !inCheck()) {
+            if (type.equals("king") && Board.board[locX][0].getType().equals("rook") && unMoved && Board.board[locX][0].isUnMoved() && !test && !saveKing()) {
                 if (x == locX && y == 2 && Board.board[locX][3] == null && Board.board[locX][2] == null && Board.board[locX][1] == null) {
                     return testMove(x, y);
                 }
