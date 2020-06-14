@@ -15,10 +15,13 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main extends Application {
     public void start(Stage stage) throws Exception{
 
+        AtomicBoolean wCheckmate = new AtomicBoolean(false);
+        AtomicBoolean bCheckmate = new AtomicBoolean(false);
 
         Selector selector = new Selector();
         selector.setWidth(32);
@@ -123,6 +126,9 @@ public class Main extends Application {
                             selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
                             spacePressed = true;
                         }
+                        else{
+                            wCheckmate.set(true);
+                        }
                     }
                     else if (blackKing.inCheck() && !whiteTurn) {
                         if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].getType().equals("king")) {
@@ -164,6 +170,9 @@ public class Main extends Application {
                             selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
                             spacePressed = true;
                         }
+                        else{
+                            bCheckmate.set(true);
+                        }
                     }
                     else{
                         selector.setFill(Color.LIGHTBLUE);
@@ -192,7 +201,7 @@ public class Main extends Application {
                 selector.setFill(Color.LIME);
                 if(selected.checkEligibility((int)selector.getArrayX(), (int)selector.getArrayY(), true)){
                     System.out.println("valid move");
-                    selected.move((int)selector.getArrayX(), (int)selector.getArrayY());
+                    selected.move((int)selector.getArrayX(), (int)selector.getArrayY(), false);
                     root.getChildren().remove(pane);
                     pane = new GridPane();
                     for (int x = 0; x < Board.board.length; x++){
@@ -230,30 +239,7 @@ public class Main extends Application {
 
         Runnable runnable = new Runnable() {
             public void run() {
-                boolean endCondition = true;
-                while(endCondition){
-                    boolean checkMate = true;
-                    for(int x = 0; x < Board.board.length; x++){
-                        for(int y = 0; y < Board.board.length; y++){
-                            if(Board.board[x][y]!= null){
-                                if(whiteTurn){
-                                    if(Board.board[x][y].canMove() && !Board.board[x][y].getState()){
-                                        System.out.println("gay");
-                                        checkMate = false;
-                                    }
-                                }
-                                if(!whiteTurn){
-                                    if(Board.board[x][y].canMove() && Board.board[x][y].getState()){
-                                        System.out.println("boy");
-                                        checkMate = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if(checkMate){
-                        endCondition = false;
-                    }
+                while (!wCheckmate.get() && !bCheckmate.get()) {
                     try {
                         gameThread.sleep(200);
                     } catch (InterruptedException e) {

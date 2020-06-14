@@ -66,13 +66,13 @@ public class Piece {
         locY = y;
     }
 
-    public void move(int newX, int newY){
+    public void move(int newX, int newY, boolean test){
         if(type.equals("king") && locY == 4 && unMoved){
             if(newX == locX && newY == 6){
-                Board.board[locX][7].move(locX,5);
+                Board.board[locX][7].move(locX,5, false);
             }
             else if(newX == locX && newY == 2){
-                Board.board[locX][0].move(locX, 3);
+                Board.board[locX][0].move(locX, 3,false);
             }
         }
 
@@ -96,7 +96,7 @@ public class Piece {
             firstMove = turn;
             unMoved = false;
         }
-        if(type.equals("pawn")) {
+        if(type.equals("pawn") && !test) {
             maxX = 1;
         }
         if(type.equals("pawn") && (newX == 7 || newX == 0)){
@@ -484,6 +484,46 @@ public class Piece {
             }
         }
         return false;
+    }
+
+    public boolean saveKing(){
+        for(int i = 0; i < Board.board.length; i++){
+            for(int j = 0; j < Board.board[i].length; j++){
+                if(Board.board[i][j] != null){
+                    if(Board.board[i][j].getState()){
+                        if(Main.blackKing.inCheck()){
+                            return false;
+                        }
+                    }
+                    else{
+                        if(Main.whiteKing.inCheck()){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean testMove(int newX, int newY){
+        int oldX = locX, oldY = locY;
+        Piece oldEnemy = null;
+        boolean test;
+        if(Board.board[newX][newY] != null){
+            if(Board.board[newX][newY].getState() != getState()){
+                oldEnemy = Board.board[newX][newY];
+            }
+        }
+
+        move(newX,newY,true);
+        test = saveKing();
+        move(oldX,oldY, true);
+        if(oldEnemy != null){
+            Board.board[newX][newY] = oldEnemy;
+        }
+
+        return test;
     }
 
     public ArrayList<Piece> getCheckingPieces(){
