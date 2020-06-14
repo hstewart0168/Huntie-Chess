@@ -68,7 +68,7 @@ public class Piece {
     }
 
     public void move(int newX, int newY, boolean test){
-        if(type.equals("king") && locY == 4 && unMoved){
+        if(type.equals("king") && locY == 4 && unMoved && !test){
             if(newX == locX && newY == 6){
                 Board.board[locX][7].move(locX,5, false);
             }
@@ -77,13 +77,13 @@ public class Piece {
             }
         }
 
-        if(type.equals("pawn") && !black && (locX == newX - 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX - 1][newY] != null){
+        if(type.equals("pawn") && !black && (locX == newX - 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX - 1][newY] != null && !test){
             if(Board.board[newX - 1][newY].getType().equals("pawn") && Board.board[newX - 1][newY].getFirstMove() == turn - 1){
                 Board.board[newX - 1][newY] = null;
             }
         }
 
-        if(type.equals("pawn") && black && (locX == newX + 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX + 1][newY] != null){
+        if(type.equals("pawn") && black && (locX == newX + 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX + 1][newY] != null && !test){
             if(Board.board[newX + 1][newY].getType().equals("pawn") && Board.board[newX + 1][newY].getFirstMove() == turn - 1){
                 Board.board[newX + 1][newY] = null;
             }
@@ -93,21 +93,22 @@ public class Piece {
         Board.board[locX][locY] = null;
         locX = newX;
         locY = newY;
-        if(unMoved){
+
+        if(unMoved && !test){
             firstMove = turn;
             unMoved = false;
         }
         if(type.equals("pawn") && !test) {
             maxX = 1;
         }
-        if(type.equals("pawn") && (newX == 7 || newX == 0)){
+        if(type.equals("pawn") && (newX == 7 || newX == 0) && !test){
             Boolean type = this.getState();
             Board.board[newX][newY] = null;
             Board.board[newX][newY] = new Piece("queen", newX, newY, type);
         }
-
-        turn++;
-
+        if(!test) {
+            turn++;
+        }
     }
 
     public Image getImage() throws FileNotFoundException {
@@ -158,15 +159,17 @@ public class Piece {
         }
 
         if (Board.board[locX][7] != null){
-            if (type.equals("king") && Board.board[locX][7].getType().equals("rook") && unMoved && Board.board[locX][7].isUnMoved() && !test && !saveKing()) {
+            if (type.equals("king") && Board.board[locX][7].getType().equals("rook") && unMoved && Board.board[locX][7].isUnMoved() && !test && saveKing()) {
                 if (x == locX && y == 6 && Board.board[locX][6] == null && Board.board[locX][5] == null) {
-                    return testMove(x, y);
+                    if(testMove(x, y)){
+                        return true;
+                    }
                 }
             }
         }
 
         if (Board.board[locX][0] != null){
-            if (type.equals("king") && Board.board[locX][0].getType().equals("rook") && unMoved && Board.board[locX][0].isUnMoved() && !test && !saveKing()) {
+            if (type.equals("king") && Board.board[locX][0].getType().equals("rook") && unMoved && Board.board[locX][0].isUnMoved() && !test && saveKing()) {
                 if (x == locX && y == 2 && Board.board[locX][3] == null && Board.board[locX][2] == null && Board.board[locX][1] == null) {
                     return testMove(x, y);
                 }
@@ -498,7 +501,6 @@ public class Piece {
             }
         }
         if(!checkingPieces.isEmpty()) {
-            System.out.println("check");
             return true;
         }
         return false;
@@ -518,16 +520,15 @@ public class Piece {
     }
 
     public boolean saveKing(){
-        if(getState()){
+        if(!Main.whiteTurn){
             if(Main.blackKing.inCheck()){
                 return false;
             }
         }
-        else{
+        else {
             if(Main.whiteKing.inCheck()){
                 return false;
             }
-
         }
         return true;
     }
