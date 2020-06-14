@@ -12,7 +12,7 @@ public class Piece {
     private int maxX, maxY;
     private int locX, locY;
     private int firstMove;
-    boolean enemy, canD, canP, unMoved;
+    boolean black, canD, canP, unMoved;
     ArrayList<Piece> checkingPieces;
     Piece checker;
 
@@ -20,7 +20,7 @@ public class Piece {
     private static int turn = 1;
 
     public Piece(String type, int x, int y, boolean e){
-        enemy = e;
+        black = e;
         unMoved = true;
         this.type = type;
         checkingPieces = new ArrayList<Piece>();
@@ -76,13 +76,13 @@ public class Piece {
             }
         }
 
-        if(type.equals("pawn") && !enemy && (locX == newX - 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX - 1][newY] != null){
+        if(type.equals("pawn") && !black && (locX == newX - 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX - 1][newY] != null){
             if(Board.board[newX - 1][newY].getType().equals("pawn") && Board.board[newX - 1][newY].getFirstMove() == turn - 1){
                 Board.board[newX - 1][newY] = null;
             }
         }
 
-        if(type.equals("pawn") && enemy && (locX == newX + 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX + 1][newY] != null){
+        if(type.equals("pawn") && black && (locX == newX + 1) && ((locY == newY - 1) || (locY == newY + 1)) && Board.board[newX + 1][newY] != null){
             if(Board.board[newX + 1][newY].getType().equals("pawn") && Board.board[newX + 1][newY].getFirstMove() == turn - 1){
                 Board.board[newX + 1][newY] = null;
             }
@@ -110,7 +110,7 @@ public class Piece {
     }
 
     public Image getImage() throws FileNotFoundException {
-        if(enemy) {
+        if(black) {
             switch (type) {
                 case "king":
                     return (new Image(new FileInputStream(new File("Sprites\\blackKing.png"))));
@@ -145,7 +145,7 @@ public class Piece {
         return (new Image(new FileInputStream(new File("Sprites\\blankSpace.png"))));
     }
 
-    public boolean checkEligibility(int x, int y, boolean first) {
+    public boolean checkEligibility(int x, int y, boolean first, boolean test) {
         if (Board.board[x][y] == this) {
             return false;
         }
@@ -157,42 +157,45 @@ public class Piece {
         }
 
         if (Board.board[locX][7] != null){
-            if (type.equals("king") && Board.board[locX][7].getType().equals("rook") && unMoved && Board.board[locX][7].isUnMoved()) {
+            if (type.equals("king") && Board.board[locX][7].getType().equals("rook") && unMoved && Board.board[locX][7].isUnMoved() && !test && !inCheck()) {
                 if (x == locX && y == 6 && Board.board[locX][6] == null && Board.board[locX][5] == null) {
-                    return true;
+                    return testMove(x, y);
                 }
             }
         }
 
         if (Board.board[locX][0] != null){
-            if (type.equals("king") && Board.board[locX][0].getType().equals("rook") && unMoved && Board.board[locX][0].isUnMoved()) {
+            if (type.equals("king") && Board.board[locX][0].getType().equals("rook") && unMoved && Board.board[locX][0].isUnMoved() && !test && !inCheck()) {
                 if (x == locX && y == 2 && Board.board[locX][3] == null && Board.board[locX][2] == null && Board.board[locX][1] == null) {
-                    return true;
+                    return testMove(x, y);
                 }
             }
         }
 
         if(type.equals("knight")){
             if(((Math.abs((x - locX)) == 2) && (Math.abs((y - locY)) == 1)) || ((Math.abs((x - locX)) == 1) && (Math.abs((y - locY)) == 2))){
-                if(Board.board[x][y] == null)
-                    return true;
-                else return Board.board[x][y].getState() != this.getState();
+                if(Board.board[x][y] == null) {
+                    return(testMove(x, y));
+                }
+                else if(Board.board[x][y].getState() != getState()){
+                    return(testMove(x, y));
+                }
             }
         }
         else if(type.equals("pawn")){
-            if(!enemy){
+            if(!black){
                 if(((x - locX) <= maxX)&& (x - locX) > 0 && (y - locY) == 0){
                     if (Board.board[x][y] == null && (Board.board[x - 1][y] == null || Board.board[x - 1][y] == this))
-                        return true;
+                        return testMove(x, y);
                 }
-                if(Board.board[x][y] != null && x == locX + 1 && (y == locY - 1 || y == locY + 1) && Board.board[x][y].getState() != enemy){
-                    return true;
+                if(Board.board[x][y] != null && x == locX + 1 && (y == locY - 1 || y == locY + 1) && Board.board[x][y].getState() != black){
+                    return testMove(x, y);
                 }
                 if(locX == 4 && y != 0 && x != 0) {
                     if(locX == x - 1 && locY == y - 1) {
                         if (Board.board[x - 1][y] != null) {
-                            if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != enemy && Board.board[x - 1][y].getFirstMove() == turn - 1) {
-                                return true;
+                            if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != black && Board.board[x - 1][y].getFirstMove() == turn - 1) {
+                                return testMove(x, y);
                             }
                         }
                     }
@@ -200,8 +203,8 @@ public class Piece {
                 if(locX == 4 && y != 7 && x != 7) {
                     if(locX == x - 1 && locY == y + 1) {
                         if (Board.board[x - 1][y] != null) {
-                            if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != enemy && Board.board[x - 1][y].getFirstMove() == turn - 1) {
-                                return true;
+                            if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != black && Board.board[x - 1][y].getFirstMove() == turn - 1) {
+                                return testMove(x, y);
                             }
                         }
                     }
@@ -210,16 +213,16 @@ public class Piece {
             else{
                 if(((locX - x) <= maxX)&& (locX - x) > 0 && (y - locY) == 0){
                     if (Board.board[x][y] == null  && (Board.board[x + 1][y] == null || Board.board[x + 1][y] == this))
-                        return true;
+                        return testMove(x, y);
                 }
-                if(Board.board[x][y] != null && x == locX - 1 && (y == locY - 1 || y == locY + 1) && Board.board[x][y].getState() != enemy){
-                    return true;
+                if(Board.board[x][y] != null && x == locX - 1 && (y == locY - 1 || y == locY + 1) && Board.board[x][y].getState() != black){
+                    return testMove(x, y);
                 }
                 if(locX == 3 && y != 0 && x != 0) {
                     if(locX == x + 1 && locY == y - 1) {
                         if (Board.board[x + 1][y] != null) {
-                            if (Board.board[x + 1][y].getType().equals("pawn") && Board.board[x + 1][y].getState() != enemy && Board.board[x + 1][y].getFirstMove() == turn - 1) {
-                                return true;
+                            if (Board.board[x + 1][y].getType().equals("pawn") && Board.board[x + 1][y].getState() != black && Board.board[x + 1][y].getFirstMove() == turn - 1) {
+                                return testMove(x, y);
                             }
                         }
                     }
@@ -227,8 +230,8 @@ public class Piece {
                 if(locX == 3 && y != 7 && x != 7) {
                     if(locX == x + 1 && locY == y + 1) {
                         if (Board.board[x + 1][y] != null) {
-                            if (Board.board[x + 1][y].getType().equals("pawn") && Board.board[x + 1][y].getState() != enemy && Board.board[x + 1][y].getFirstMove() == turn - 1) {
-                                return true;
+                            if (Board.board[x + 1][y].getType().equals("pawn") && Board.board[x + 1][y].getState() != black && Board.board[x + 1][y].getFirstMove() == turn - 1) {
+                                return testMove(x, y);
                             }
                         }
                     }
@@ -253,9 +256,9 @@ public class Piece {
                         }
                     }
                     if(Board.board[x][y] == null)
-                        return true;
+                        return testMove(x, y);
                     else if(Board.board[x][y].getState() != this.getState())
-                        return true;
+                        return testMove(x, y);
                 } else if (x == locX) {
                     if (y < locY) {
                         for (int i = locY; i > y; i--) {
@@ -271,9 +274,9 @@ public class Piece {
                         }
                     }
                     if(Board.board[x][y] == null)
-                        return true;
+                        return testMove(x, y);
                     else if(Board.board[x][y].getState() != this.getState())
-                        return true;
+                        return testMove(x, y);
                 }
                 if((x != locX && y != locY) && (Math.abs((x - locX)) == Math.abs((y - locY)))){
                     if(x > locX && y > locY) {
@@ -285,8 +288,10 @@ public class Piece {
                             }
                         }
                         if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                            return testMove(x, y);
+                        else if(Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                     else if(x < locX && y < locY) {
                         for (int i = locX; i > x; i--) {
@@ -297,8 +302,10 @@ public class Piece {
                             }
                         }
                         if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                            return testMove(x, y);
+                        else if (Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                     else if(x > locX) {
                         for (int i = locX; i < x; i++) {
@@ -309,8 +316,10 @@ public class Piece {
                             }
                         }
                         if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                            return testMove(x, y);
+                        else if (Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                     else {
                         for (int i = locX; i > x; i--) {
@@ -320,9 +329,12 @@ public class Piece {
                                 }
                             }
                         }
-                        if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                        if(Board.board[x][y] == null) {
+                            return testMove(x, y);
+                        }
+                        else if (Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                 }
                 return false;
@@ -337,9 +349,12 @@ public class Piece {
                                 }
                             }
                         }
-                        if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                        if(Board.board[x][y] == null) {
+                            return testMove(x, y);
+                        }
+                        else if (Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                     else if(x < locX && y < locY) {
                         for (int i = locX; i > x; i--) {
@@ -349,9 +364,12 @@ public class Piece {
                                 }
                             }
                         }
-                        if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                        if(Board.board[x][y] == null) {
+                            return testMove(x, y);
+                        }
+                        else if (Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                     else if(x > locX) {
                         for (int i = locX; i < x; i++) {
@@ -361,9 +379,12 @@ public class Piece {
                                 }
                             }
                         }
-                        if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                        if(Board.board[x][y] == null) {
+                            return testMove(x, y);
+                        }
+                        else if(Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                     else {
                         for (int i = locX; i > x; i--) {
@@ -373,9 +394,12 @@ public class Piece {
                                 }
                             }
                         }
-                        if(Board.board[x][y] == null)
-                            return true;
-                        else return Board.board[x][y].getState() != this.getState();
+                        if(Board.board[x][y] == null) {
+                            return testMove(x, y);
+                        }
+                        else if (Board.board[x][y].getState() != getState()){
+                            return testMove(x, y);
+                        }
                     }
                 }
                 return false;
@@ -396,9 +420,12 @@ public class Piece {
                             }
                         }
                     }
-                    if(Board.board[x][y] == null)
-                        return true;
-                    else return Board.board[x][y].getState() != this.getState();
+                    if(Board.board[x][y] == null) {
+                        return testMove(x, y);
+                    }
+                    else if (Board.board[x][y].getState() != getState()){
+                        return testMove(x, y);
+                    }
                 }
                 else if(x == locX){
                     if(y < locY){
@@ -415,9 +442,12 @@ public class Piece {
                             }
                         }
                     }
-                    if(Board.board[x][y] == null)
-                        return true;
-                    else return Board.board[x][y].getState() != this.getState();
+                    if(Board.board[x][y] == null) {
+                        return testMove(x, y);
+                    }
+                    else if (Board.board[x][y].getState() != getState()){
+                        return testMove(x, y);
+                    }
                 }
                 return false;
             }
@@ -429,7 +459,7 @@ public class Piece {
     public boolean canMove(){
         for(int x = 0; x < Board.board.length; x++){
             for(int y = 0; y < Board.board[x].length; y++){
-                if(this.checkEligibility(x, y, true)){
+                if(this.checkEligibility(x, y, true, false)){
                     return true;
                 }
             }
@@ -443,7 +473,7 @@ public class Piece {
 
 
     public boolean getState() {
-        return enemy;
+        return black;
     }
 
     public String getType(){
@@ -459,7 +489,7 @@ public class Piece {
         for(int i = 0; i < Board.board.length; i++){
             for(int j = 0; j < Board.board[i].length; j++){
                 if(Board.board[i][j] != null) {
-                    if (Board.board[i][j].getState() != getState() && Board.board[i][j].checkEligibility(locX, locY, true)) {
+                    if (Board.board[i][j].getState() != getState() && Board.board[i][j].checkEligibility(locX, locY, true, true)) {
                         checkingPieces.add(Board.board[i][j]);
                         checker = Board.board[i][j];
                     }
@@ -477,7 +507,7 @@ public class Piece {
         for(int i = 0; i < Board.board.length; i++){
             for(int j = 0; j < Board.board[i].length; j++){
                 if(Board.board[i][j] != null) {
-                    if (Board.board[i][j].getState() != getState() && Board.board[i][j].checkEligibility(x, y, false)) {
+                    if (Board.board[i][j].getState() != getState() && Board.board[i][j].checkEligibility(x, y, false, false)) {
                         return true;
                     }
                 }
@@ -487,21 +517,16 @@ public class Piece {
     }
 
     public boolean saveKing(){
-        for(int i = 0; i < Board.board.length; i++){
-            for(int j = 0; j < Board.board[i].length; j++){
-                if(Board.board[i][j] != null){
-                    if(Board.board[i][j].getState()){
-                        if(Main.blackKing.inCheck()){
-                            return false;
-                        }
-                    }
-                    else{
-                        if(Main.whiteKing.inCheck()){
-                            return false;
-                        }
-                    }
-                }
+        if(getState()){
+            if(Main.blackKing.inCheck()){
+                return false;
             }
+        }
+        else{
+            if(Main.whiteKing.inCheck()){
+                return false;
+            }
+
         }
         return true;
     }

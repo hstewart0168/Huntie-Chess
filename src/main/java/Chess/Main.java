@@ -91,7 +91,7 @@ public class Main extends Application {
                             selector.setFill(Color.LIGHTBLUE);
                             for (int x = 0; x < Board.board.length; x++) {
                                 for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true)) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false)) {
                                         Rectangle rectangle = new Rectangle(32, 32);
                                         rectangle.setTranslateX(x * 32);
                                         rectangle.setTranslateY(y * 32);
@@ -113,7 +113,7 @@ public class Main extends Application {
                             selector.setFill(Color.LIGHTBLUE);
                             for (int x = 0; x < Board.board.length; x++) {
                                 for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true) && Board.board[x][y] == checker) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false) && Board.board[x][y] == checker) {
                                         Rectangle rectangle = new Rectangle(32, 32);
                                         rectangle.setTranslateX(x * 32);
                                         rectangle.setTranslateY(y * 32);
@@ -135,7 +135,7 @@ public class Main extends Application {
                             selector.setFill(Color.LIGHTBLUE);
                             for (int x = 0; x < Board.board.length; x++) {
                                 for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true)) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false)) {
                                         Rectangle rectangle = new Rectangle(32, 32);
                                         rectangle.setTranslateX(x * 32);
                                         rectangle.setTranslateY(y * 32);
@@ -157,7 +157,7 @@ public class Main extends Application {
                             selector.setFill(Color.LIGHTBLUE);
                             for (int x = 0; x < Board.board.length; x++) {
                                 for (int y = 0; y < Board.board[x].length; y++) {
-                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true) && Board.board[x][y] == checker) {
+                                    if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false) && Board.board[x][y] == checker) {
                                         Rectangle rectangle = new Rectangle(32, 32);
                                         rectangle.setTranslateX(x * 32);
                                         rectangle.setTranslateY(y * 32);
@@ -178,7 +178,7 @@ public class Main extends Application {
                         selector.setFill(Color.LIGHTBLUE);
                         for (int x = 0; x < Board.board.length; x++) {
                             for (int y = 0; y < Board.board[x].length; y++) {
-                                if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true)) {
+                                if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false)) {
                                     Rectangle rectangle = new Rectangle(32, 32);
                                     rectangle.setTranslateX(x * 32);
                                     rectangle.setTranslateY(y * 32);
@@ -199,7 +199,7 @@ public class Main extends Application {
                 root.getChildren().add(overlay);
                 spacePressed = false;
                 selector.setFill(Color.LIME);
-                if(selected.checkEligibility((int)selector.getArrayX(), (int)selector.getArrayY(), true)){
+                if(selected.checkEligibility((int)selector.getArrayX(), (int)selector.getArrayY(), true, false)){
                     System.out.println("valid move");
                     selected.move((int)selector.getArrayX(), (int)selector.getArrayY(), false);
                     root.getChildren().remove(pane);
