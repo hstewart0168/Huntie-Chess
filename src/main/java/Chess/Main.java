@@ -1,12 +1,16 @@
 package Chess;
 
 import javafx.application.Application;
+import javafx.event.Event;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -20,14 +24,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Main extends Application {
     public void start(Stage stage) throws Exception{
 
-        AtomicBoolean wCheckmate = new AtomicBoolean(false);
-        AtomicBoolean bCheckmate = new AtomicBoolean(false);
+        TextArea textStream = new TextArea();
+        textStream.setLayoutX(32);
+        textStream.setLayoutY(384);
+        textStream.setMaxSize(448,64);
+
+        textStream.setEditable(false);
+        textStream.setDisable(true);
+        textStream.setOpacity(1);
+
+        textStream.setText("hi");
 
         Selector selector = new Selector();
+        selector.setLayoutY(64);
+        selector.setLayoutX(128);
         selector.setWidth(32);
         selector.setHeight(32);
         selector.setFill(Color.LIME);
         selector.setOpacity(.5);
+
+        pane.setLayoutX(128);
+        pane.setLayoutY(64);
 
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
@@ -45,6 +62,10 @@ public class Main extends Application {
         blackKing = Board.board[7][4];
 
         GridPane backPane = new GridPane();
+
+        backPane.setLayoutX(128);
+        backPane.setLayoutY(64);
+
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
                 if(x % 2 == 0 && y % 2 != 0){
@@ -62,9 +83,10 @@ public class Main extends Application {
             }
         }
 
-        Group root = new Group(backPane, pane, selector, overlay);
 
-        Scene scene = new Scene(root, 256, 256);
+        Group root = new Group(textStream, backPane, pane, selector, overlay);
+
+        Scene scene = new Scene(root, 512, 512);
         scene.setFill(Color.BEIGE);
 
         scene.setOnKeyPressed((KeyEvent event) -> {
@@ -141,6 +163,7 @@ public class Main extends Application {
             }
         });
 
+
         stage.setResizable(false);
         stage.setTitle("Huntie Chess");
         stage.getIcons().add(new Image(new FileInputStream(new File("Sprites\\blackPawn.png"))));
@@ -149,14 +172,41 @@ public class Main extends Application {
 
         Runnable runnable = new Runnable() {
             public void run() {
-                while (!wCheckmate.get() && !bCheckmate.get()) {
+                boolean gameover = true;
+                String winner = "bruh";
+                while (gameover) {
+                    gameover = false;
+                    if(whiteTurn) {
+                        for (int x = 0; x < Board.board.length; x++) {
+                            for (int y = 0; y < Board.board[x].length; y++) {
+                                if (Board.board[x][y] != null && !Board.board[x][y].getState()) {
+                                    if(Board.board[x][y].canMove()){
+                                        gameover = true;
+                                        winner = "white";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        for (int x = 0; x < Board.board.length; x++) {
+                            for (int y = 0; y < Board.board[x].length; y++) {
+                                if (Board.board[x][y] != null && Board.board[x][y].getState()) {
+                                    if(Board.board[x][y].canMove()){
+                                        gameover = true;
+                                        winner = "black";
+                                    }
+                                }
+                            }
+                        }
+                    }
                     try {
                         gameThread.sleep(200);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                System.out.println("game end");
+                System.out.println("game end " + winner + " wins");
             }
         };
 
@@ -169,13 +219,12 @@ public class Main extends Application {
     public static void main(String[] args) {
         Board.initializeBoard();
         launch(args);
-        gameThread.stop();
     }
 
     private static boolean spacePressed = false;
     private static Group overlay = new Group();
     private static Piece selected;
-    private static GridPane pane = new GridPane();
+    private GridPane pane = new GridPane();
     public static boolean whiteTurn = true;
     private static Thread gameThread;
     public static Piece whiteKing;
