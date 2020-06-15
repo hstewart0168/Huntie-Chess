@@ -33,8 +33,6 @@ public class Main extends Application {
         textStream.setDisable(true);
         textStream.setOpacity(1);
 
-        textStream.setText("hi");
-
         Selector selector = new Selector();
         selector.setLayoutY(64);
         selector.setLayoutX(128);
@@ -49,7 +47,7 @@ public class Main extends Application {
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
                 if(Board.board[x][y] != null) {
-                    pane.add(new ImageView(Board.board[x][y].getImage()), x, y, 1, 1);
+                    pane.add(new ImageView(Board.board[x][y].getImage()), y, x, 1, 1);
                 }
                 else{
                     pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), y, x, 1, 1);
@@ -69,15 +67,15 @@ public class Main extends Application {
         for (int x = 0; x < Board.board.length; x++){
             for(int y = 0; y <Board.board[x].length; y++) {
                 if(x % 2 == 0 && y % 2 != 0){
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), x, y, 1, 1);
+                }
+                else if(x % 2 != 0 && y % 2 == 0){
+                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), x, y, 1, 1);
+                }
+                else if(x % 2 == 0 && y % 2 == 0){
                     backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), x, y, 1, 1);
                 }
                 else if(x % 2 != 0 && y % 2 != 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), x, y, 1, 1);
-                }
-                else if(x % 2 == 0){
-                    backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\greenTile.png")))), x, y, 1, 1);
-                }
-                else {
                     backPane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\whiteTile.png")))), x, y, 1, 1);
                 }
             }
@@ -107,21 +105,21 @@ public class Main extends Application {
                 selector.setTranslateY(selector.getYCoord());
             }
             else if(event.getCode() == KeyCode.SPACE && !spacePressed){
-                if(Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()] != null && Board.board[(int)selector.getArrayX()][(int)selector.getArrayY()].getState() != whiteTurn) {
+                if(Board.board[(int)selector.getArrayY()][(int)selector.getArrayX()] != null && Board.board[(int)selector.getArrayY()][(int)selector.getArrayX()].getState() != whiteTurn) {
                         selector.setFill(Color.LIGHTBLUE);
                         for (int x = 0; x < Board.board.length; x++) {
                             for (int y = 0; y < Board.board[x].length; y++) {
-                                if (Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()].checkEligibility(x, y, true, false)) {
+                                if (Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()].checkEligibility(x, y, true, false)) {
                                     Rectangle rectangle = new Rectangle(32, 32);
-                                    rectangle.setTranslateX(x * 32);
-                                    rectangle.setTranslateY(y * 32);
+                                    rectangle.setTranslateX(y * 32 + 128);
+                                    rectangle.setTranslateY(x * 32 + 64);
                                     rectangle.setFill(Color.DARKRED);
                                     rectangle.setOpacity(.5);
                                     overlay.getChildren().add(rectangle);
                                 }
                             }
                         }
-                        selected = Board.board[(int) selector.getArrayX()][(int) selector.getArrayY()];
+                        selected = Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()];
                         spacePressed = true;
                 }
             }
@@ -131,16 +129,22 @@ public class Main extends Application {
                 root.getChildren().add(overlay);
                 spacePressed = false;
                 selector.setFill(Color.LIME);
-                if(selected.checkEligibility((int)selector.getArrayX(), (int)selector.getArrayY(), true, false)){
+                if(selected.checkEligibility((int)selector.getArrayY(), (int)selector.getArrayX(), true, false)){
+                    int oldX = selected.getLocX();
+                    int oldY = selected.getLocY();
+                    Piece capture = null;
                     System.out.println("valid move");
-                    selected.move((int)selector.getArrayX(), (int)selector.getArrayY(), false);
+                    if(Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()] != null){
+                        capture = Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()];
+                    }
+                    String moveType = selected.move((int)selector.getArrayY(), (int)selector.getArrayX(), false);
                     root.getChildren().remove(pane);
                     pane = new GridPane();
                     for (int x = 0; x < Board.board.length; x++){
                         for(int y = 0; y <Board.board[x].length; y++) {
                             if(Board.board[x][y] != null) {
                                 try {
-                                    pane.add(new ImageView(Board.board[x][y].getImage()), x, y, 1, 1);
+                                    pane.add(new ImageView(Board.board[x][y].getImage()), y, x, 1, 1);
                                 } catch (FileNotFoundException e) {
                                     e.printStackTrace();
                                 }
@@ -154,6 +158,9 @@ public class Main extends Application {
                             }
                         }
                     }
+                    pane.setLayoutX(128);
+                    pane.setLayoutY(64);
+                    textStream.appendText(String.format("  %d. %s", Piece.getTurn() ,selected.getNotation(capture, moveType, oldX, oldY)));
                     root.getChildren().add(pane);
                     whiteTurn = !whiteTurn;
                 }
@@ -182,7 +189,7 @@ public class Main extends Application {
                                 if (Board.board[x][y] != null && !Board.board[x][y].getState()) {
                                     if(Board.board[x][y].canMove()){
                                         gameover = true;
-                                        winner = "white";
+                                        winner = "1/0";
                                     }
                                 }
                             }
@@ -194,7 +201,7 @@ public class Main extends Application {
                                 if (Board.board[x][y] != null && Board.board[x][y].getState()) {
                                     if(Board.board[x][y].canMove()){
                                         gameover = true;
-                                        winner = "black";
+                                        winner = "0/1";
                                     }
                                 }
                             }
@@ -206,7 +213,8 @@ public class Main extends Application {
                         e.printStackTrace();
                     }
                 }
-                System.out.println("game end " + winner + " wins");
+                textStream.appendText(String.format("+ %s", winner));
+                textStream.setDisable(false);
             }
         };
 
