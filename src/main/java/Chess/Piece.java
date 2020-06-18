@@ -73,6 +73,7 @@ public class Piece {
         locY = y;
     }
 
+
     public String move(int newX, int newY, boolean test) {
         String moveType = "none";
         if (type.equals("king") && locY == 4 && unMoved && !test) {
@@ -653,5 +654,9 @@ public class Piece {
 
     public static int getTurn(){
         return turn;
+    }
+
+    public static void resetTurn(){
+        turn = 0;
     }
 }

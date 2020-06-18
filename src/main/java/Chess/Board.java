@@ -1,6 +1,8 @@
 package Chess;
 
 public class Board {
+    public static boolean initialized;
+
     public static Piece[][] board = new Piece[8][8];
 
     public static void initializeBoard(){
@@ -46,5 +48,19 @@ public class Board {
                 }
             }
         }
+        initialized = true;
+    }
+
+    public static void clearBoard(){
+        for(int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                board[i][j] = null;
+            }
+        }
+        initialized = false;
+    }
+
+    public static boolean isInitialized(){
+        return initialized;
     }
 }

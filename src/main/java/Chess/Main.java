@@ -1,10 +1,12 @@
 package Chess;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,7 +23,8 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
+import static java.lang.Thread.sleep;
 
 public class Main extends Application {
     public void start(Stage stage) throws Exception{
@@ -34,8 +37,13 @@ public class Main extends Application {
 
         MenuBar menuBar = new MenuBar();
         Menu play = new Menu("Play");
-        menuBar.getMenus().add(play);
+        menuBar.getMenus().addAll(play);
         menuBar.prefWidthProperty().bind(stage.widthProperty());
+
+        MenuItem playTwo = new MenuItem("Two Player");
+
+
+        play.getItems().add(playTwo);
 
         String beepPath = "Sounds\\beep.mp3";
         Media beep = new Media(new File(beepPath).toURI().toString());
@@ -61,20 +69,7 @@ public class Main extends Application {
         pane.setLayoutX(128);
         pane.setLayoutY(96);
 
-        for (int x = 0; x < Board.board.length; x++){
-            for(int y = 0; y <Board.board[x].length; y++) {
-                if(Board.board[x][y] != null) {
-                    pane.add(new ImageView(Board.board[x][y].getImage()), y, x, 1, 1);
-                }
-                else{
-                    pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), y, x, 1, 1);
-                }
-            }
-        }
-
-
-        whiteKing = Board.board[0][4];
-        blackKing = Board.board[7][4];
+        refreshBoard();
 
         GridPane backPane = new GridPane();
 
@@ -139,31 +134,31 @@ public class Main extends Application {
         scene.setFill(Color.BEIGE);
 
         scene.setOnKeyPressed((KeyEvent event) -> {
-            if(event.getCode() == KeyCode.D && selector.getArrayX() < 7){
+            if(event.getCode() == KeyCode.D && selector.getArrayX() < 7 && Board.isInitialized()){
                 beeper.stop();
                 beeper.play();
                 selector.addXCoord(32);
                 selector.setTranslateX(selector.getXCoord());
             }
-            else if(event.getCode() == KeyCode.W && selector.getArrayY() > 0) {
+            else if(event.getCode() == KeyCode.W && selector.getArrayY() > 0 && Board.isInitialized()) {
                 beeper.stop();
                 beeper.play();
                 selector.addYCoord(-32);
                 selector.setTranslateY(selector.getYCoord());
             }
-            else if(event.getCode() == KeyCode.A && selector.getArrayX() > 0){
+            else if(event.getCode() == KeyCode.A && selector.getArrayX() > 0 && Board.isInitialized()){
                 beeper.stop();
                 beeper.play();
                 selector.addXCoord(-32);
                 selector.setTranslateX(selector.getXCoord());
             }
-            else if(event.getCode() == KeyCode.S && selector.getArrayY() < 7){
+            else if(event.getCode() == KeyCode.S && selector.getArrayY() < 7 && Board.isInitialized()){
                 beeper.stop();
                 beeper.play();
                 selector.addYCoord(32);
                 selector.setTranslateY(selector.getYCoord());
             }
-            else if(event.getCode() == KeyCode.SPACE && !spacePressed){
+            else if(event.getCode() == KeyCode.SPACE && !spacePressed && Board.isInitialized()){
                 beeper.stop();
                 beeper.play();
                 if(Board.board[(int)selector.getArrayY()][(int)selector.getArrayX()] != null && Board.board[(int)selector.getArrayY()][(int)selector.getArrayX()].getState() != whiteTurn) {
@@ -203,31 +198,22 @@ public class Main extends Application {
                     String moveType = selected.move((int)selector.getArrayY(), (int)selector.getArrayX(), false);
                     root.getChildren().remove(pane);
                     pane = new GridPane();
-                    for (int x = 0; x < Board.board.length; x++){
-                        for(int y = 0; y <Board.board[x].length; y++) {
-                            if(Board.board[x][y] != null) {
-                                try {
-                                    pane.add(new ImageView(Board.board[x][y].getImage()), y, x, 1, 1);
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            else{
-                                try {
-                                    pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), x, y, 1, 1);
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
+                    try {
+                        refreshBoard();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     pane.setLayoutX(128);
                     pane.setLayoutY(96);
                     if(Piece.getTurn() == 1){
-                        textStream.appendText(String.format("%d. %s", Piece.getTurn() ,selected.getNotation(capture, moveType, oldX, oldY)));
+                        textStream.appendText(String.format("%d. %s", turn ,selected.getNotation(capture, moveType, oldX, oldY)));
+                    }
+                    else if(whiteTurn){
+                        turn++;
+                        textStream.appendText(String.format("  %d. %s", turn, selected.getNotation(capture, moveType, oldX, oldY)));
                     }
                     else {
-                        textStream.appendText(String.format("  %d. %s", Piece.getTurn(), selected.getNotation(capture, moveType, oldX, oldY)));
+                        textStream.appendText(String.format("  %s", selected.getNotation(capture, moveType, oldX, oldY)));
                     }
                     root.getChildren().add(pane);
                     whiteTurn = !whiteTurn;
@@ -247,9 +233,27 @@ public class Main extends Application {
 
         Runnable runnable = new Runnable() {
             public void run() {
+                Board.initializeBoard();
+
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        try {
+                            refreshBoard();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                whiteKing = Board.board[0][4];
+                blackKing = Board.board[7][4];
+
+                selector.setOpacity(.5);
+
                 boolean gameover = false;
                 String winner = "bruh";
-                while (!gameover) {
+                while (!gameover && !forceEnd) {
+                    System.out.println(this);
                     gameover = true;
                     if(whiteTurn) {
                         for (int x = 0; x < Board.board.length; x++) {
@@ -290,36 +294,95 @@ public class Main extends Application {
                         }
                     }
                     try {
-                        gameThread.sleep(200);
+                        sleep(200);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                textStream.appendText(String.format("+ %s", winner));
-                textStream.setDisable(false);
+                if(!forceEnd) {
+                    textStream.appendText(String.format("+ %s", winner));
+                    textStream.setDisable(false);
+                }
+                System.out.println("thread done");
             }
         };
 
-        gameThread = new Thread(runnable);
+        Runnable runnable1 = new Runnable() {
+            public void run() {
+                selector.setDisable(true);
+                selector.setOpacity(0);
+                while(!playTwoPlayer){
+                    try {
+                        sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                playTwoPlayer = false;
+                try {
+                    stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
 
-        gameThread.start();
+        Thread menuThread = new Thread(runnable1);
+
+        playTwo.setOnAction(event -> {
+            forceEnd = true;
+            whiteTurn = true;
+            textStream.clear();
+            turn = 1;
+            Piece.resetTurn();
+            Board.clearBoard();
+            try {
+                refreshBoard();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            playTwoPlayer = true;
+            Thread gameThread = new Thread(runnable);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            forceEnd = false;
+            gameThread.start();
+        });
+
+        menuThread.start();
     }
 
 
     public static void main(String[] args) {
-
-        Board.initializeBoard();
         launch(args);
+        forceEnd = true;
+    }
 
-        gameThread.stop();
+    public static void refreshBoard() throws Exception{
+        pane.getChildren().clear();
+        for (int x = 0; x < Board.board.length; x++){
+            for(int y = 0; y <Board.board[x].length; y++) {
+                if(Board.board[x][y] != null) {
+                    pane.add(new ImageView(Board.board[x][y].getImage()), y, x, 1, 1);
+                }
+                else{
+                    pane.add(new ImageView(new Image(new FileInputStream(new File("Sprites\\blankSpace.png")))), y, x, 1, 1);
+                }
+            }
+        }
     }
 
     private static boolean spacePressed = false;
     private static Group overlay = new Group();
     private static Piece selected;
-    private GridPane pane = new GridPane();
+    private static GridPane pane = new GridPane();
     public static boolean whiteTurn = true;
-    private static Thread gameThread;
     public static Piece whiteKing;
     public static Piece blackKing;
+    public static int turn = 1;
+    public static boolean playTwoPlayer = false;
+    public static boolean forceEnd = false;
 }
