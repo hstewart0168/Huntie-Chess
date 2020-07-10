@@ -209,6 +209,7 @@ public class Piece {
                     if (locX == x - 1 && locY == y - 1) {
                         if (Board.board[x - 1][y] != null) {
                             if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != black && Board.board[x - 1][y].getFirstMove() == turn - 1) {
+                                System.out.println("en passe");
                                 return testMove(x, y);
                             }
                         }
@@ -218,6 +219,7 @@ public class Piece {
                     if (locX == x - 1 && locY == y + 1) {
                         if (Board.board[x - 1][y] != null) {
                             if (Board.board[x - 1][y].getType().equals("pawn") && Board.board[x - 1][y].getState() != black && Board.board[x - 1][y].getFirstMove() == turn - 1) {
+                                System.out.println("en passe");
                                 return testMove(x, y);
                             }
                         }

@@ -29,28 +29,30 @@ import static java.lang.Thread.sleep;
 public class Main extends Application {
     public void start(Stage stage) throws Exception{
 
+        //Creates the Text Area which shows algebraic notation
         TextArea textStream = new TextArea();
         textStream.setLayoutX(32);
         textStream.setLayoutY(416);
         textStream.setMaxSize(448,64);
         textStream.setMinSize(448,64);
 
+        //Creates the option bar and options
         MenuBar menuBar = new MenuBar();
         Menu play = new Menu("Play");
         menuBar.getMenus().addAll(play);
         menuBar.prefWidthProperty().bind(stage.widthProperty());
 
+        //Creates sub-obtions and adds them to the relevant option
         MenuItem playTwo = new MenuItem("Two Player");
-
-
         play.getItems().add(playTwo);
 
+        VBox vBox = new VBox(menuBar); //Finishes menubar
+
+        //Creates the sounds
         String beepPath = "Sounds\\beep.mp3";
         Media beep = new Media(new File(beepPath).toURI().toString());
         MediaPlayer beeper = new MediaPlayer(beep);
         beeper.setVolume(.1);
-
-        VBox vBox = new VBox(menuBar);
 
         textStream.setEditable(false);
         textStream.setDisable(true);
@@ -253,7 +255,6 @@ public class Main extends Application {
                 boolean gameover = false;
                 String winner = "bruh";
                 while (!gameover && !forceEnd) {
-                    System.out.println(this);
                     gameover = true;
                     if(whiteTurn) {
                         for (int x = 0; x < Board.board.length; x++) {
@@ -330,6 +331,7 @@ public class Main extends Application {
         Thread menuThread = new Thread(runnable1);
 
         playTwo.setOnAction(event -> {
+            selector.setDisable(false);
             forceEnd = true;
             whiteTurn = true;
             textStream.clear();
