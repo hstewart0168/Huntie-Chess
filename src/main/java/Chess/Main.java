@@ -44,7 +44,11 @@ public class Main extends Application {
 
         //Creates sub-obtions and adds them to the relevant option
         MenuItem playTwo = new MenuItem("Two Player");
+        MenuItem playWhite = new MenuItem("Play As White");
+        MenuItem playBlack = new MenuItem("Play As Black");
         play.getItems().add(playTwo);
+        play.getItems().add(playWhite);
+        play.getItems().add(playBlack);
 
         VBox vBox = new VBox(menuBar); //Finishes menubar
 
@@ -160,10 +164,11 @@ public class Main extends Application {
                 selector.addYCoord(32);
                 selector.setTranslateY(selector.getYCoord());
             }
-            else if(event.getCode() == KeyCode.SPACE && !spacePressed && Board.isInitialized()){
-                beeper.stop();
-                beeper.play();
-                if(Board.board[(int)selector.getArrayY()][(int)selector.getArrayX()] != null && Board.board[(int)selector.getArrayY()][(int)selector.getArrayX()].getState() != whiteTurn) {
+            else if(event.getCode() == KeyCode.SPACE && player){
+                if (!spacePressed && Board.isInitialized()) {
+                    beeper.stop();
+                    beeper.play();
+                    if (Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()] != null && Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()].getState() != whiteTurn) {
                         selector.setFill(Color.LIGHTBLUE);
                         for (int x = 0; x < Board.board.length; x++) {
                             for (int y = 0; y < Board.board[x].length; y++) {
@@ -179,49 +184,52 @@ public class Main extends Application {
                         }
                         selected = Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()];
                         spacePressed = true;
+                    }
                 }
-            }
-            else if(event.getCode() == KeyCode.SPACE) {
-                beeper.stop();
-                beeper.play();
-                root.getChildren().remove(overlay);
-                overlay = new Group();
-                root.getChildren().add(overlay);
-                spacePressed = false;
-                selector.setFill(Color.SLATEBLUE);
-                if(selected.checkEligibility((int)selector.getArrayY(), (int)selector.getArrayX(), true, false)){
-                    int oldX = selected.getLocX();
-                    int oldY = selected.getLocY();
-                    Piece capture = null;
-                    System.out.println("valid move");
-                    if(Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()] != null){
-                        capture = Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()];
+                else if(Board.isInitialized()) {
+                    beeper.stop();
+                    beeper.play();
+                    root.getChildren().remove(overlay);
+                    overlay = new Group();
+                    root.getChildren().add(overlay);
+                    spacePressed = false;
+                    selector.setFill(Color.SLATEBLUE);
+                    if (selected.checkEligibility((int) selector.getArrayY(), (int) selector.getArrayX(), true, false)) {
+                        int oldX = selected.getLocX();
+                        int oldY = selected.getLocY();
+                        Piece capture = null;
+                        System.out.println("valid move");
+                        if (Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()] != null) {
+                            capture = Board.board[(int) selector.getArrayY()][(int) selector.getArrayX()];
+                        }
+                        String moveType = selected.move((int) selector.getArrayY(), (int) selector.getArrayX(), false);
+                        root.getChildren().remove(pane);
+                        pane = new GridPane();
+                        try {
+                            refreshBoard();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        pane.setLayoutX(128);
+                        pane.setLayoutY(96);
+                        if (Piece.getTurn() == 1) {
+                            textStream.appendText(String.format("%d. %s", turn, selected.getNotation(capture, moveType, oldX, oldY)));
+                        } else if (whiteTurn) {
+                            turn++;
+                            textStream.appendText(String.format("  %d. %s", turn, selected.getNotation(capture, moveType, oldX, oldY)));
+                        } else {
+                            textStream.appendText(String.format("  %s", selected.getNotation(capture, moveType, oldX, oldY)));
+                        }
+                        root.getChildren().add(pane);
+                        if(!twoPlayer) {
+                            player = !player;
+                            whiteTurn = !whiteTurn;
+                            textStream.appendText(opponent.setMove());
+                        }
+                        else{
+                            whiteTurn = !whiteTurn;
+                        }
                     }
-                    String moveType = selected.move((int)selector.getArrayY(), (int)selector.getArrayX(), false);
-                    root.getChildren().remove(pane);
-                    pane = new GridPane();
-                    try {
-                        refreshBoard();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    pane.setLayoutX(128);
-                    pane.setLayoutY(96);
-                    if(Piece.getTurn() == 1){
-                        textStream.appendText(String.format("%d. %s", turn ,selected.getNotation(capture, moveType, oldX, oldY)));
-                    }
-                    else if(whiteTurn){
-                        turn++;
-                        textStream.appendText(String.format("  %d. %s", turn, selected.getNotation(capture, moveType, oldX, oldY)));
-                    }
-                    else {
-                        textStream.appendText(String.format("  %s", selected.getNotation(capture, moveType, oldX, oldY)));
-                    }
-                    root.getChildren().add(pane);
-                    whiteTurn = !whiteTurn;
-                }
-                else{
-                    System.out.println("invalid move");
                 }
             }
         });
@@ -312,18 +320,26 @@ public class Main extends Application {
             public void run() {
                 selector.setDisable(true);
                 selector.setOpacity(0);
-                while(!playTwoPlayer){
+                while(!inPlay){
                     try {
                         sleep(200);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                playTwoPlayer = false;
+                inPlay = false;
                 try {
                     stop();
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+            }
+        };
+
+        Runnable runnable2 = new Runnable() {
+            public void run() {
+                while(true){
+                    opponent.setMove();
                 }
             }
         };
@@ -343,7 +359,9 @@ public class Main extends Application {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            playTwoPlayer = true;
+            inPlay = true;
+            player = true;
+            twoPlayer = true;
             Thread gameThread = new Thread(runnable);
             try {
                 Thread.sleep(500);
@@ -352,6 +370,66 @@ public class Main extends Application {
             }
             forceEnd = false;
             gameThread.start();
+        });
+
+        playWhite.setOnAction(event -> {
+            selector.setDisable(false);
+            forceEnd = true;
+            whiteTurn = true;
+            textStream.clear();
+            turn = 1;
+            Piece.resetTurn();
+            Board.clearBoard();
+            try {
+                refreshBoard();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            inPlay = true;
+            player = true;
+            twoPlayer = false;
+            opponent = new AI();
+            Thread gameThread = new Thread(runnable);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            forceEnd = false;
+            gameThread.start();
+        });
+
+        playBlack.setOnAction(event -> {
+            selector.setDisable(false);
+            forceEnd = true;
+            whiteTurn = true;
+            textStream.clear();
+            turn = 1;
+            Piece.resetTurn();
+            Board.clearBoard();
+            try {
+                refreshBoard();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            inPlay = true;
+            player = false;
+            twoPlayer = false;
+            opponent = new AI();
+            Thread gameThread = new Thread(runnable);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            forceEnd = false;
+            gameThread.start();
+            try {
+                sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            textStream.appendText(opponent.setMove());
         });
 
         menuThread.start();
@@ -385,6 +463,9 @@ public class Main extends Application {
     public static Piece whiteKing;
     public static Piece blackKing;
     public static int turn = 1;
-    public static boolean playTwoPlayer = false;
+    public static boolean inPlay = false;
     public static boolean forceEnd = false;
+    public static boolean player;
+    public static boolean twoPlayer = false;
+    public static AI opponent;
 }

@@ -1,13 +1,14 @@
-Chess/Selector.java
- Chess.Selector
-Launcher/Main.java
- Launcher.Main
 Chess/Board.java
  Chess.Board
+Chess/Selector.java
+ Chess.Selector
 Chess/Main.java
  Chess.Main
  Chess.Main$1
  Chess.Main$1$1
  Chess.Main$2
+ Chess.Main$3
+Chess/AI.java
+ Chess.AI
 Chess/Piece.java
  Chess.Piece
