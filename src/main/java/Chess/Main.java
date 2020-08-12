@@ -310,7 +310,7 @@ public class Main extends Application {
                 }
                 if(!forceEnd) {
                     textStream.appendText(String.format("+ %s", winner));
-                    textStream.setDisable(false);
+                    textStream.setDisable(true);
                 }
                 System.out.println("thread done");
             }
@@ -347,7 +347,7 @@ public class Main extends Application {
         Thread menuThread = new Thread(runnable1);
 
         playTwo.setOnAction(event -> {
-            selector.setDisable(false);
+            selector.setDisable(true);
             forceEnd = true;
             whiteTurn = true;
             textStream.clear();
@@ -373,7 +373,7 @@ public class Main extends Application {
         });
 
         playWhite.setOnAction(event -> {
-            selector.setDisable(false);
+            selector.setDisable(true);
             forceEnd = true;
             whiteTurn = true;
             textStream.clear();
@@ -400,7 +400,7 @@ public class Main extends Application {
         });
 
         playBlack.setOnAction(event -> {
-            selector.setDisable(false);
+            selector.setDisable(true);
             forceEnd = true;
             whiteTurn = true;
             textStream.clear();
