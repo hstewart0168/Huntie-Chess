@@ -8,7 +8,9 @@ Chess/Main.java
  Chess.Main$1$1
  Chess.Main$2
  Chess.Main$3
-Chess/AI.java
- Chess.AI
 Chess/Piece.java
  Chess.Piece
+Chess/AI.java
+ Chess.AI
+Chess/Coordinate.java
+ Chess.Coordinate

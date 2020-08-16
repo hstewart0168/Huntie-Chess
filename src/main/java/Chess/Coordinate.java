@@ -12,11 +12,28 @@ public class Coordinate {
         this.y = y;
         this.x2 = x2;
         this.y2 = y2;
-        score = 0;
+        findScore();
     }
 
     public void findScore(){
         score = 0;
+        if(Board.board[x2][y2] != null){
+            Piece selected = Board.board[x2][y2];
+            switch (selected.getType()){
+                case "pawn" -> {
+                    score++;
+                }
+                case "rook" -> {
+                    score+=5;
+                }
+                case "bishop", "knight" -> {
+                    score+=3;
+                }
+                case "queen" -> {
+                    score +=9;
+                }
+            }
+        }
     }
 
     public int getScore(){
